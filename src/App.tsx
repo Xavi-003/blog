@@ -233,7 +233,7 @@ function App() {
   }, [accent])
 
   return (
-    <Router>
+    <Router basename="/blog">
       <SettingsPanel isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} theme={theme} setTheme={setTheme} accent={accent} setAccent={setAccent} />
       <Routes>
         <Route path="/" element={<Home onOpenSettings={() => setIsSettingsOpen(true)} />} />

@@ -4,7 +4,8 @@ import ReactMarkdown from 'react-markdown'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Search, ArrowRight, ChevronDown, X, Calendar, LayoutGrid,
-  ArrowLeft, Zap, ChevronUp, Settings, Sun, Moon, Clock, Globe, Info
+  ArrowLeft, Zap, ChevronUp, Settings, Sun, Moon, Clock, Globe, Info,
+  Github, Linkedin, ExternalLink
 } from 'lucide-react'
 import './App.css'
 import postsDataRaw from './data/posts.json'
@@ -80,6 +81,21 @@ const SettingsPanel = ({ isOpen, onClose, theme, setTheme, accent, setAccent }: 
               {COLORS.map(c => (
                 <div key={c.value} onClick={() => setAccent(c.value)} className={`color-option ${accent === c.value ? 'active' : ''}`} style={{ background: c.value }} title={c.name} />
               ))}
+            </div>
+          </div>
+
+          <div style={{ marginTop: 'auto', paddingTop: '2.5rem', borderTop: '1px solid var(--card-border)' }}>
+            <p style={{ fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase', marginBottom: '1.2rem', color: 'var(--text-muted)' }}>Developer Connect</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <a href="https://github.com/Xavi-003" target="_blank" rel="noopener noreferrer" className="connect-link">
+                <Github size={18} /> GitHub Profile
+              </a>
+              <a href="https://linkedin.com/in/antony-xavier" target="_blank" rel="noopener noreferrer" className="connect-link">
+                <Linkedin size={18} /> LinkedIn
+              </a>
+              <a href="https://antony-xavier.com" target="_blank" rel="noopener noreferrer" className="connect-link">
+                <ExternalLink size={18} /> Portfolio
+              </a>
             </div>
           </div>
         </motion.div>
@@ -234,13 +250,32 @@ const Home = ({ onOpenSettings }: any) => {
 const EditorialPage = () => {
   const { slug } = useParams();
   const post = postsData.find(p => p.slug === slug);
-  useEffect(() => { window.scrollTo(0, 0); if (post) document.title = post.title; }, [post]);
+  const [readingProgress, setReadingProgress] = useState(0);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    if (post) document.title = post.title;
+
+    const handleScroll = () => {
+      const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = (window.scrollY / totalHeight) * 100;
+      setReadingProgress(progress);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [post]);
+
   if (!post) return <div style={{ padding: '5rem', textAlign: 'center' }}>Post not found.</div>;
   
   const formatDate = (dateStr: string) => new Date(dateStr).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
 
   return (
     <motion.div initial="initial" animate="animate" exit="exit" variants={pageVariants} className="editorial-page">
+      <div className="reading-progress-container">
+        <div className="reading-progress-bar" style={{ width: `${readingProgress}%` }}></div>
+      </div>
+
       <nav className="editorial-nav">
         <Link to="/" className="editorial-back-btn"><ArrowLeft size={16} /> BACK TO LIBRARY</Link>
         <div style={{display: 'flex', gap: '1rem', alignItems: 'center'}}><Zap fill="var(--primary-color)" color="var(--primary-color)" size={18} /><span style={{fontSize: '0.8rem', fontWeight: 800, color: 'var(--primary-color)', letterSpacing: '0.1em'}}>AI INSIGHTS PRO</span></div>
@@ -264,6 +299,10 @@ const EditorialPage = () => {
       )}
 
       <motion.article initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.6 }} className="editorial-body">
+        <div className="editorial-lead-text">
+          This comprehensive briefing provides a deep dive into {post.title}, analyzing the technical specifications, market implications, and future outlook of this significant technology update.
+        </div>
+
         <ReactMarkdown>{post.content}</ReactMarkdown>
         
         <div className="source-highlight-card">

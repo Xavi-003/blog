@@ -63,6 +63,9 @@ body {
 
 /* --- EDITORIAL PAGE REDESIGN --- */
 .editorial-page { padding-top: 4rem; padding-bottom: 8rem; }
+.reading-progress-container { position: fixed; top: 0; left: 0; width: 100%; height: 4px; background: rgba(0,0,0,0.1); z-index: 2000; }
+.reading-progress-bar { height: 100%; background: var(--primary-color); transition: width 0.1s ease; }
+
 .editorial-nav { position: fixed; top: 0; left: 0; right: 0; background: rgba(var(--bg-white), 0.8); backdrop-filter: blur(10px); border-bottom: 1px solid var(--card-border); height: 64px; display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; z-index: 1000; }
 .editorial-back-btn { display: flex; align-items: center; gap: 0.5rem; color: var(--text-muted); text-decoration: none; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.1em; }
 
@@ -85,19 +88,27 @@ body {
   max-width: 800px; margin: 0 auto; font-size: 1.25rem; line-height: 1.8; 
   color: var(--text-dark);
 }
-.editorial-body h2 { font-size: 2rem; font-weight: 800; margin: 3rem 0 1.5rem; color: var(--primary-color); letter-spacing: -0.02em; }
-.editorial-body p { margin-bottom: 1.8rem; }
-.editorial-body ul, .editorial-body ol { margin: 0 0 2rem 1.5rem; }
-.editorial-body li { margin-bottom: 0.8rem; }
+
+.editorial-lead-text {
+  font-size: 1.6rem; font-weight: 600; line-height: 1.5; color: var(--text-muted);
+  border-left: 4px solid var(--primary-color); padding-left: 2rem; margin-bottom: 4rem;
+}
+
+.editorial-body h1, .editorial-body h2 { font-size: 2.2rem; font-weight: 800; margin: 4rem 0 1.5rem; color: var(--primary-color); letter-spacing: -0.02em; }
+.editorial-body h3 { font-size: 1.8rem; font-weight: 700; margin: 3rem 0 1rem; color: var(--text-dark); }
+.editorial-body p { margin-bottom: 2rem; }
+.editorial-body ul, .editorial-body ol { margin: 0 0 2.5rem 1.5rem; }
+.editorial-body li { margin-bottom: 1rem; }
 
 .source-highlight-card { 
-  margin-top: 5rem; padding: 3rem; background: var(--light-gray); 
-  border-radius: 32px; border: 2px solid var(--primary-color);
+  margin-top: 6rem; padding: 4rem 3rem; background: var(--light-gray); 
+  border-radius: 40px; border: 2px solid var(--primary-color);
   display: flex; flex-direction: column; align-items: center; text-align: center;
 }
 .source-label { background: var(--primary-color); color: white; padding: 0.4rem 1.2rem; border-radius: 99px; font-weight: 800; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 1.5rem; }
-.source-name { font-size: 1.5rem; font-weight: 800; margin-bottom: 1rem; }
-.source-link-btn { color: var(--primary-color); text-decoration: none; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; font-size: 1.1rem; }
+.source-name { font-size: 1.8rem; font-weight: 900; margin-bottom: 1rem; letter-spacing: -0.01em; }
+.source-link-btn { color: var(--primary-color); text-decoration: none; font-weight: 800; display: flex; align-items: center; gap: 0.5rem; font-size: 1.1rem; border: 2px solid var(--primary-color); padding: 0.8rem 2rem; border-radius: 99px; transition: all 0.2s; }
+.source-link-btn:hover { background: var(--primary-color); color: white; }
 
 /* FLOATING UI */
 .floating-ui { position: fixed; bottom: 2rem; right: 2rem; display: flex; flex-direction: column; gap: 1rem; z-index: 3000; }
@@ -106,10 +117,24 @@ body {
 .fab-settings { background: var(--bg-white); color: var(--text-dark); border: 1px solid var(--card-border); }
 
 /* Settings Panel */
-.settings-panel { position: fixed; top: 0; right: 0; bottom: 0; width: 340px; background: var(--bg-white); border-left: 1px solid var(--card-border); z-index: 4000; padding: 2.5rem; box-shadow: -10px 0 30px rgba(0,0,0,0.05); }
+.settings-panel { position: fixed; top: 0; right: 0; bottom: 0; width: 340px; background: var(--bg-white); border-left: 1px solid var(--card-border); z-index: 4000; padding: 2.5rem; box-shadow: -10px 0 30px rgba(0,0,0,0.05); display: flex; flex-direction: column; }
+
+.connect-link {
+  color: var(--text-dark);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.5rem 0;
+  transition: color 0.2s;
+}
+.connect-link:hover { color: var(--primary-color); }
 
 @media (max-width: 768px) {
   .editorial-title-xl { font-size: 2.5rem; }
   .editorial-meta-wrap { flex-direction: column; gap: 1rem; align-items: center; }
   .doodle-grid { grid-template-columns: 1fr; }
+  .editorial-lead-text { font-size: 1.3rem; }
 }

@@ -389,8 +389,10 @@ body {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   border-radius: 14px;
-  overflow: hidden;
+  overflow: visible;
   padding: 0;
+  position: relative;
+  z-index: 20;
 }
 
 .filter-item {

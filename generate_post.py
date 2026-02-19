@@ -103,16 +103,42 @@ def fetch_latest_news():
                 logger.error(f"Feed processing error for {url}: {e}")
     return articles
 
-def generate_content(article=None):
+def get_available_models():
+    """Discover available Gemini models and return sorted by cost (cheapest first)."""
+    preferred_order = [
+        'gemini-2.0-flash-lite',
+        'gemini-2.0-flash',
+        'gemini-1.5-flash',
+        'gemini-1.5-flash-latest',
+        'gemini-2.0-flash-exp',
+    ]
+    available = []
+    try:
+        for m in genai.list_models():
+            if 'generateContent' in [method.name for method in m.supported_generation_methods]:
+                name = m.name.replace('models/', '')
+                available.append(name)
+    except Exception as e:
+        logger.warning(f"Could not list models: {e}. Using defaults.")
+        return ['gemini-2.0-flash-lite', 'gemini-2.0-flash']
+    
+    # Sort by preferred order (cheapest first)
+    sorted_models = [m for m in preferred_order if m in available]
+    # Add any other available flash models not in our preferred list
+    for m in available:
+        if 'flash' in m and m not in sorted_models:
+            sorted_models.append(m)
+    
+    logger.info(f"Available models (cheapest first): {sorted_models[:5]}")
+    return sorted_models[:5] if sorted_models else ['gemini-2.0-flash-lite']
+
+def generate_content(article=None, models=None):
     if not os.getenv("GEMINI_API_KEY"):
         logger.error("Skipping content generation: No API Key")
         return None, None
     
-    models_to_try = [
-        'models/gemini-2.0-flash-lite',
-        'models/gemini-2.0-flash',
-        'models/gemini-1.5-flash'
-    ]
+    if models is None:
+        models = get_available_models()
     
     if article:
         prompt = f"""
@@ -128,7 +154,6 @@ def generate_content(article=None):
         5. Use bold text and bullet points.
         """
     else:
-        # AI Insight Mode - Dynamic Topic Selection
         prompt = """
         Act as a visionary tech journalist.
         Select a specific, cutting-edge, niche topic related to AI, Quantum Computing, Space, Biotechnology, or Cybernetics. 
@@ -145,11 +170,12 @@ def generate_content(article=None):
         6. DO NOT repeat common topics. Be creative and unique.
         """
 
-    for model_name in models_to_try:
+    for model_name in models:
         try:
-            logger.info(f"Trying model: {model_name}...")
-            model = genai.GenerativeModel(model_name)
+            logger.info(f"Using model: {model_name}...")
+            model = genai.GenerativeModel(f"models/{model_name}")
             response = model.generate_content(prompt)
+            logger.info(f"✅ Content generated with {model_name}")
             return response.text, (article['source'] if article else "AI Synthesis")
 
         except Exception as e:
@@ -158,7 +184,7 @@ def generate_content(article=None):
                 logger.warning(f"Rate limited on {model_name}. Waiting 45s...")
                 time.sleep(45)
             else:
-                logger.warning(f"Model {model_name} failed: {e}")
+                logger.warning(f"{model_name} failed: {e}")
             continue
             
     return None, None
@@ -228,6 +254,10 @@ def save_post(title, content, original_link, source, image_url=None):
 
 def main():
     logger.info("Starting AI Blog Generator...")
+    
+    # Discover models once
+    models = get_available_models()
+    
     articles = fetch_latest_news()
     logger.info(f"Fetched {len(articles)} articles from RSS feeds.")
     
@@ -247,7 +277,7 @@ def main():
         slug = re.sub(r'[^a-z0-9]+', '-', article['title'].lower()).strip('-')
         if slug not in existing_slugs:
             logger.info(f"Processing: {article['title']}")
-            content, source = generate_content(article)
+            content, source = generate_content(article, models)
             if content:
                 if save_post(article['title'], content, article['link'], source, article.get('image_url')):
                     logger.info("✅ New post saved from news!")
@@ -256,7 +286,7 @@ def main():
     # 2. Fallback: generate AI Insight
     logger.info("No new news. Generating AI Insight...")
     for attempt in range(3):
-        content, source = generate_content()
+        content, source = generate_content(None, models)
         if content:
             title = "AI Insight"
             match = re.search(r'^# (.*)', content)
@@ -271,4 +301,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

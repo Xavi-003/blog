@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Search, ArrowRight, ChevronDown, X, Calendar, LayoutGrid,
   ArrowLeft, Zap, ChevronUp, Settings, Sun, Moon, Clock, Globe, Info,
-  Github, Linkedin, ExternalLink, Loader2
+  Github, Linkedin, ExternalLink
 } from 'lucide-react'
 import './App.css'
 import postsDataRaw from './data/posts.json'

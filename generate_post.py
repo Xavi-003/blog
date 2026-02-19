@@ -63,17 +63,22 @@ def generate_blog_content(article):
     
     model = genai.GenerativeModel('gemini-1.5-flash')
     prompt = f"""
-    Write a high-quality, engaging blog post about: {article['title']}.
-    Source context: {article['summary']}
+    Write a comprehensive, professional, and exciting blog post about a major technology launch or update: {article['title']}.
+    Context: {article['summary']}
     Link: {article['link']}
 
-    Guidelines:
-    - Use clear, professional, yet exciting language.
-    - Use Markdown for structure: headers (##), bullet points, and bold text.
-    - Make it easy to understand for tech enthusiasts.
-    - Keep it around 300-400 words.
-    - Start directly with a H1 header (# Title).
-    - Include a final 'Why it Matters' section.
+    STRICT GUIDELINES:
+    1. Focus ONLY on the technology, its technical specifications, launch details, and industry impact.
+    2. Write at least 500-700 words.
+    3. Use Markdown with clear sections:
+       - # [Catchy Title]
+       - ## Executive Summary
+       - ## Technical Deep Dive (What's New?)
+       - ## Market Impact & Launch Details
+       - ## The Future Outlook
+       - ## Why it Matters
+    4. At the very end, add a section: "--- SOURCE HIGHLIGHT: This insight was adapted from [Source Name] ([Link])"
+    5. Use bold text for key features and bullet points for specs.
 
     Return ONLY raw Markdown.
     """

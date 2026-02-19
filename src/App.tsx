@@ -236,27 +236,42 @@ const EditorialPage = () => {
   const post = postsData.find(p => p.slug === slug);
   useEffect(() => { window.scrollTo(0, 0); if (post) document.title = post.title; }, [post]);
   if (!post) return <div style={{ padding: '5rem', textAlign: 'center' }}>Post not found.</div>;
+  
+  const formatDate = (dateStr: string) => new Date(dateStr).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+
   return (
     <motion.div initial="initial" animate="animate" exit="exit" variants={pageVariants} className="editorial-page">
       <nav className="editorial-nav">
-        <Link to="/" className="editorial-back-btn"><ArrowLeft size={18} /> BACK</Link>
-        <div style={{display: 'flex', gap: '1rem', alignItems: 'center'}}><Zap fill="var(--primary-color)" color="var(--primary-color)" size={18} /><span style={{fontSize: '0.8rem', fontWeight: 800, color: 'var(--primary-color)'}}>AI INSIGHTS</span></div>
+        <Link to="/" className="editorial-back-btn"><ArrowLeft size={16} /> BACK TO LIBRARY</Link>
+        <div style={{display: 'flex', gap: '1rem', alignItems: 'center'}}><Zap fill="var(--primary-color)" color="var(--primary-color)" size={18} /><span style={{fontSize: '0.8rem', fontWeight: 800, color: 'var(--primary-color)', letterSpacing: '0.1em'}}>AI INSIGHTS PRO</span></div>
       </nav>
-      <header className="editorial-header">
+
+      <header className="editorial-header-redesign">
         <motion.span initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }} className="editorial-category">{post.category}</motion.span>
-        <motion.h1 initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }} className="editorial-title">{post.title}</motion.h1>
+        <motion.h1 initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }} className="editorial-title-xl">{post.title}</motion.h1>
+        
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }} className="editorial-meta-wrap">
+          <div className="meta-item"><Calendar size={16} /> {formatDate(post.date)}</div>
+          <div className="meta-item"><Clock size={16} /> {post.reading_time} Read</div>
+          <div className="meta-item"><Globe size={16} /> {post.source}</div>
+        </motion.div>
       </header>
+
       {post.image && (
-        <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.4 }} className="editorial-hero-frame">
+        <motion.div initial={{ scale: 0.98, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.5 }} className="editorial-hero-frame">
           <img src={post.image} alt="" />
         </motion.div>
       )}
-      <motion.article initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.5 }} className="editorial-body">
+
+      <motion.article initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.6 }} className="editorial-body">
         <ReactMarkdown>{post.content}</ReactMarkdown>
-        <div style={{ marginTop: '4rem', padding: '2rem', background: 'var(--bg-white)', borderRadius: '16px', border: '1px solid var(--card-border)' }}>
-          <h3 style={{ marginBottom: '1rem' }}>Original Source</h3>
-          <a href={post.original_link} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary-color)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-             Read full article on {post.source} <ArrowRight size={16} />
+        
+        <div className="source-highlight-card">
+          <div className="source-label">Primary Intelligence Source</div>
+          <div className="source-name">{post.source.toUpperCase()}</div>
+          <p style={{marginBottom: '1.5rem', fontSize: '1rem', color: 'var(--text-muted)'}}>This technical briefing was synthesized from verified reports and real-time data provided by {post.source}.</p>
+          <a href={post.original_link} target="_blank" rel="noopener noreferrer" className="source-link-btn">
+             EXPLORE ORIGINAL SOURCE <ArrowRight size={20} />
           </a>
         </div>
       </motion.article>

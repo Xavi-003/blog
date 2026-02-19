@@ -44,14 +44,14 @@ body {
 .header-connect-icons a { color: var(--text-muted); transition: color 0.2s; display: flex; align-items: center; }
 .header-connect-icons a:hover { color: var(--primary-color); }
 
-.search-section { padding: 1.5rem 0 1.5rem; display: flex; flex-direction: column; align-items: center; }
+.search-section { padding: 1.5rem 0 1.5rem; display: flex; flex-direction: column; align-items: center; position: relative; }
 .search-pill-container { width: 100%; max-width: 800px; position: relative; display: flex; align-items: center; }
-.main-search-bar { width: 100%; padding: 1.2rem 16rem 1.2rem 4rem; font-size: 1.15rem; border: 1px solid var(--card-border); border-radius: 999px; outline: none; background: var(--bg-white); color: var(--text-dark); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-.search-button-blue { position: absolute; right: 125px; background-color: var(--primary-color); color: white; border: none; padding: 0.7rem 1.8rem; border-radius: 999px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; }
+.main-search-bar { width: 100%; padding: 1.2rem 10rem 1.2rem 4rem; font-size: 1.15rem; border: 1px solid var(--card-border); border-radius: 999px; outline: none; background: var(--bg-white); color: var(--text-dark); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+.search-button-blue { position: absolute; right: 8px; background-color: var(--primary-color); color: white; border: none; padding: 0.7rem 1.8rem; border-radius: 999px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; }
 
-.search-connect-icons { position: absolute; right: 25px; display: flex; gap: 1rem; align-items: center; color: var(--text-muted); }
-.search-connect-icons a { color: inherit; transition: color 0.2s; display: flex; align-items: center; }
-.search-connect-icons a:hover { color: var(--primary-color); }
+.search-connect-icons-far-right { position: absolute; right: 2rem; top: 50%; transform: translateY(-50%); display: flex; gap: 1.2rem; align-items: center; color: var(--text-muted); }
+.search-connect-icons-far-right a { color: inherit; transition: color 0.2s; display: flex; align-items: center; }
+.search-connect-icons-far-right a:hover { color: var(--primary-color); }
 
 /* BLUE FILTER BAR */
 .blue-filter-bar { background-color: var(--primary-color); width: 100%; display: grid; grid-template-columns: repeat(6, 1fr); height: 48px; z-index: 50; }

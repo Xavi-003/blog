@@ -142,17 +142,18 @@ const Home = ({ onOpenSettings }: any) => {
 
   return (
     <motion.div initial="initial" animate="animate" exit="exit" variants={pageVariants} className="app-shell" ref={dropdownRef}>
-      <section className={`search-section ${isScrolled ? 'hidden' : ''}`}>
+      <section className={`search-section ${isScrolled ? 'hidden' : ''}`} style={{position: 'relative'}}>
         <motion.div initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="search-pill-container">
           <Search className="search-icon-large" size={24} />
           <input type="text" className="main-search-bar" placeholder="Search the AI Library" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
-          <button className="search-button-blue" style={{right: '120px'}}>Search <ArrowRight size={18} /></button>
-          <div className="search-connect-icons">
-            <a href="https://github.com/Xavi-003" target="_blank" rel="noopener noreferrer" title="GitHub"><Github size={20} /></a>
-            <a href="https://linkedin.com/in/antony-xavier" target="_blank" rel="noopener noreferrer" title="LinkedIn"><Linkedin size={20} /></a>
-            <a href="https://antony-xavier.com" target="_blank" rel="noopener noreferrer" title="Portfolio"><ExternalLink size={20} /></a>
-          </div>
+          <button className="search-button-blue">Search <ArrowRight size={18} /></button>
         </motion.div>
+
+        <div className="search-connect-icons-far-right">
+          <a href="https://github.com/Xavi-003" target="_blank" rel="noopener noreferrer" title="GitHub"><Github size={20} /></a>
+          <a href="https://linkedin.com/in/antony-xavier" target="_blank" rel="noopener noreferrer" title="LinkedIn"><Linkedin size={20} /></a>
+          <a href="https://antony-xavier.com" target="_blank" rel="noopener noreferrer" title="Portfolio"><ExternalLink size={20} /></a>
+        </div>
 
         <AnimatePresence>
           {(searchQuery || activeCategory || activeSource || activeTime) && (

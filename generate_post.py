@@ -60,7 +60,7 @@ def fetch_feed(feed_url):
     try:
         feed = feedparser.parse(feed_url)
         feed_articles = []
-        for entry in feed.entries[:5]:  # Limit to top 5 per feed to ensure freshness
+        for entry in feed.entries[:5]:
             image_url = None
             if 'media_content' in entry and entry.media_content:
                 image_url = entry.media_content[0].get('url')
@@ -128,9 +128,8 @@ def generate_content(article=None):
         5. Use bold text and bullet points.
         """
     else:
-    else:
         # AI Insight Mode - Dynamic Topic Selection
-        prompt = f"""
+        prompt = """
         Act as a visionary tech journalist.
         Select a specific, cutting-edge, niche topic related to AI, Quantum Computing, Space, Biotechnology, or Cybernetics. 
         Choose a topic that is highly specific (e.g., instead of "AI in 2026", use "Liquid Neural Networks replacing Transformers").
@@ -148,7 +147,7 @@ def generate_content(article=None):
 
     for model_name in models_to_try:
         try:
-            logger.info(f"Attempting valid generation with model: {model_name}...")
+            logger.info(f"Attempting generation with model: {model_name}...")
             model = genai.GenerativeModel(model_name)
             response = model.generate_content(prompt)
             return response.text, (article['source'] if article else "AI Synthesis")
@@ -179,7 +178,6 @@ def save_post(title, content, original_link, source, image_url=None):
     for i, line in enumerate(lines[:5]):
         if line.startswith("# "):
             generated_title = line.replace("# ", "").strip()
-            # Remove title from content to avoid duplication
             content = "\n".join(lines[i+1:]).strip()
             break
 
@@ -213,7 +211,7 @@ def save_post(title, content, original_link, source, image_url=None):
     
     posts.insert(0, new_post)
     
-    # Keep only latest 100 posts to check file size
+    # Keep only latest 100 posts
     if len(posts) > 100:
         posts = posts[:100]
 
@@ -236,7 +234,8 @@ def main():
         try:
             with open(posts_file, "r") as f:
                 existing_slugs = [p.get('slug') for p in json.load(f)]
-        except: pass
+        except:
+            pass
 
     # 1. Try to find a NEW news article
     for article in articles:
@@ -256,7 +255,8 @@ def main():
         if content:
             title = "The Future of Computing"
             match = re.search(r'^# (.*)', content)
-            if match: title = match.group(1)
+            if match:
+                title = match.group(1)
             
             if save_post(title, content, "https://github.com/Xavi-003/blog", source):
                 logger.info("AI Insight generated and saved successfully.")

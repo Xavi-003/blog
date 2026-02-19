@@ -29,6 +29,8 @@ FORMATS = ["Long Form", "Quick Summary", "Bullet Points"]
 api_key = os.getenv("GEMINI_API_KEY")
 if api_key:
     genai.configure(api_key=api_key)
+else:
+    print("WARNING: GEMINI_API_KEY not found in environment.")
 
 def fetch_latest_news():
     articles = []

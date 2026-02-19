@@ -128,27 +128,22 @@ def generate_content(article=None):
         5. Use bold text and bullet points.
         """
     else:
-        # AI Insight Mode
-        topic = random.choice([
-            "The Rise of Autonomous AI Agents in 2026",
-            "Breakthroughs in Solid State Batteries for EVs",
-            "Local LLMs: Running 70B Models on Consumer Hardware",
-            "Neuralink's Next Generation Brain Chip Architecture",
-            "Sustainable Computing: Green Data Centers",
-            "Generative Video: From Clips to Full Movies",
-            "The End of Smartphones? AI Wearables Take Over",
-            "Quantum Internet: First Practical nodes",
-            "Rust in the Linux Kernel: A Progress Report",
-            "WebAssembly (Wasm) and the Future of Cloud Computing"
-        ])
+    else:
+        # AI Insight Mode - Dynamic Topic Selection
         prompt = f"""
-        Generate a breaking news style technical blog post about: {topic}.
+        Act as a visionary tech journalist.
+        Select a specific, cutting-edge, niche topic related to AI, Quantum Computing, Space, Biotechnology, or Cybernetics. 
+        Choose a topic that is highly specific (e.g., instead of "AI in 2026", use "Liquid Neural Networks replacing Transformers").
+        
+        Generate a breaking news style technical blog post about it.
         
         STRICT GUIDELINES:
-        1. Write a 700-word visionary analysis as if this technology just had a major breakthrough.
-        2. Use Markdown: # Title, ## The Breakthrough, ## How It Works, ## Industry Impact, ## Future Outlook.
-        3. End with: "--- SOURCE: AI Intelligence Synthesis"
-        4. Tone: Professional, Excited, Technical.
+        1. Write a 700-word visionary analysis.
+        2. START with a valid Markdown Title like: # [Your Unique Title Here]
+        3. Use Markdown structure: ## The Breakthrough, ## How It Works, ## Industry Impact, ## Future Outlook.
+        4. End with: "--- SOURCE: AI Intelligence Synthesis"
+        5. Tone: Professional, Excited, Technical.
+        6. DO NOT repeat common topics. Be creative and unique.
         """
 
     for model_name in models_to_try:
@@ -255,13 +250,19 @@ def main():
 
     # 2. If no new news, trigger "AI Insight Mode"
     logger.info("No new news found. Generating original AI Insight...")
-    content, source = generate_content()
-    if content:
-        title = "The Future of Computing"
-        match = re.search(r'^# (.*)', content)
-        if match: title = match.group(1)
-        
-        save_post(title, content, "https://github.com/Xavi-003/blog", source)
+    
+    for attempt in range(3):
+        content, source = generate_content()
+        if content:
+            title = "The Future of Computing"
+            match = re.search(r'^# (.*)', content)
+            if match: title = match.group(1)
+            
+            if save_post(title, content, "https://github.com/Xavi-003/blog", source):
+                logger.info("AI Insight generated and saved successfully.")
+                return
+            else:
+                logger.warning(f"Generated duplicate AI Insight (Attempt {attempt+1}/3). Retrying...")
 
 if __name__ == "__main__":
     main()

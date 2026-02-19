@@ -633,6 +633,8 @@ body {
   background: linear-gradient(180deg, var(--gradient-start) 0%, var(--bg-white) 100%);
   padding: 6rem 2rem 4rem;
   text-align: center;
+  max-width: 960px;
+  margin: 0 auto;
   border-bottom: 1px solid var(--card-border);
   position: relative;
 }
@@ -696,7 +698,7 @@ body {
 }
 
 .editorial-hero-frame {
-  max-width: 860px;
+  max-width: 960px;
   margin: -2rem auto 3rem;
   border-radius: 18px;
   overflow: hidden;
@@ -713,12 +715,12 @@ body {
 }
 
 .editorial-body {
-  max-width: 700px;
+  max-width: 900px;
   margin: 0 auto;
   font-size: 1.1rem;
   line-height: 1.85;
   color: var(--text-dark);
-  padding: 0 1.5rem;
+  padding: 0 2rem;
 }
 
 .editorial-lead-text {

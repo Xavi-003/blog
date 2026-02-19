@@ -6,6 +6,10 @@ from datetime import datetime
 import random
 import json
 import re
+import concurrent.futures
+import uuid
+import logging
+from bs4 import BeautifulSoup
 
 # Configuration
 RSS_FEEDS = [
@@ -25,54 +29,89 @@ CATEGORIES = ["AI", "Future", "Mobile", "Hardware", "Security", "Computing", "Sp
 STYLES = ["Deep Dive", "News Flash", "Tech Opinion", "Briefing"]
 FORMATS = ["Long Form", "Quick Summary", "Bullet Points"]
 
+# Configure Logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
 # Configure Gemini
 api_key = os.getenv("GEMINI_API_KEY")
 if api_key:
     genai.configure(api_key=api_key)
 else:
-    print("WARNING: GEMINI_API_KEY not found in environment.")
+    logger.warning("GEMINI_API_KEY not found in environment. Content generation will be limited.")
+
+def sanitize_text(text):
+    """Sanitize text by removing HTML tags and excessive whitespace."""
+    if not text:
+        return ""
+    try:
+        soup = BeautifulSoup(text, "html.parser")
+        text = soup.get_text(separator=" ")
+        return " ".join(text.split())
+    except Exception as e:
+        logger.error(f"Error sanitizing text: {e}")
+        return text
+
+def fetch_feed(feed_url):
+    """Fetch and parse a single RSS feed."""
+    try:
+        feed = feedparser.parse(feed_url)
+        feed_articles = []
+        for entry in feed.entries[:5]:  # Limit to top 5 per feed to ensure freshness
+            image_url = None
+            if 'media_content' in entry and entry.media_content:
+                image_url = entry.media_content[0].get('url')
+            if not image_url and 'media_thumbnail' in entry and entry.media_thumbnail:
+                image_url = entry.media_thumbnail[0].get('url')
+            if not image_url and 'links' in entry:
+                for link in entry.links:
+                    if link.get('type', '').startswith('image/'):
+                        image_url = link.get('href')
+                        break
+            
+            summary = getattr(entry, "summary", "")
+            if not summary and "content" in entry:
+                summary = entry.content[0].value
+
+            feed_articles.append({
+                "title": sanitize_text(entry.title),
+                "link": entry.link,
+                "summary": sanitize_text(summary),
+                "source": feed_url.split('/')[2].replace('www.', ''),
+                "image_url": image_url
+            })
+        return feed_articles
+    except Exception as e:
+        logger.error(f"Error fetching {feed_url}: {e}")
+        return []
 
 def fetch_latest_news():
+    """Fetch news from all feeds concurrently."""
     articles = []
-    for feed_url in RSS_FEEDS:
-        try:
-            feed = feedparser.parse(feed_url)
-            for entry in feed.entries[:10]:
-                image_url = None
-                if 'media_content' in entry and entry.media_content:
-                    image_url = entry.media_content[0].get('url')
-                if not image_url and 'media_thumbnail' in entry and entry.media_thumbnail:
-                    image_url = entry.media_thumbnail[0].get('url')
-                if not image_url and 'links' in entry:
-                    for link in entry.links:
-                        if link.get('type', '').startswith('image/'):
-                            image_url = link.get('href')
-                            break
-                
-                summary = getattr(entry, "summary", "")
-                if not summary and "content" in entry:
-                    summary = entry.content[0].value
-
-                articles.append({
-                    "title": entry.title,
-                    "link": entry.link,
-                    "summary": summary,
-                    "source": feed_url.split('/')[2].replace('www.', ''),
-                    "image_url": image_url
-                })
-        except Exception as e:
-            print(f"Error fetching {feed_url}: {e}")
+    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+        future_to_url = {executor.submit(fetch_feed, url): url for url in RSS_FEEDS}
+        for future in concurrent.futures.as_completed(future_to_url):
+            url = future_to_url[future]
+            try:
+                data = future.result()
+                articles.extend(data)
+            except Exception as e:
+                logger.error(f"Feed processing error for {url}: {e}")
     return articles
 
 def generate_content(article=None):
     if not os.getenv("GEMINI_API_KEY"):
+        logger.error("Skipping content generation: No API Key")
         return None, None
     
-    # Updated to use models found in your specific API list
     models_to_try = [
         'models/gemini-2.0-flash',
         'models/gemini-2.0-flash-lite',
-        'models/gemini-flash-latest'
+        'models/gemini-flash-latest',
+        'models/gemini-1.5-flash'
     ]
     
     if article:
@@ -89,7 +128,7 @@ def generate_content(article=None):
         5. Use bold text and bullet points.
         """
     else:
-        # AI Insight Mode - No news found, generate original content
+        # AI Insight Mode
         topic = random.choice([
             "The Quantum Computing Breakthrough of 2026",
             "Next-Gen Solid State Battery Technology",
@@ -109,12 +148,12 @@ def generate_content(article=None):
 
     for model_name in models_to_try:
         try:
-            print(f"Attempting to use model: {model_name}...")
+            logger.info(f"Attempting valid generation with model: {model_name}...")
             model = genai.GenerativeModel(model_name)
             response = model.generate_content(prompt)
             return response.text, (article['source'] if article else "AI Synthesis")
         except Exception as e:
-            print(f"Error with model {model_name}: {e}")
+            logger.warning(f"Model {model_name} failed: {e}")
             continue
             
     return None, None
@@ -124,34 +163,39 @@ def save_post(title, content, original_link, source, image_url=None):
     os.makedirs(data_dir, exist_ok=True)
     posts_file = os.path.join(data_dir, "posts.json")
     posts = []
+    
     if os.path.exists(posts_file):
-        with open(posts_file, "r") as f:
-            try: posts = json.load(f)
-            except: posts = []
+        try:
+            with open(posts_file, "r") as f:
+                posts = json.load(f)
+        except json.JSONDecodeError:
+            logger.warning("posts.json is corrupted or empty. Starting fresh.")
+            posts = []
 
-    # Clean title and generate slug
+    # Clean title and extract from content if needed
     generated_title = title
     lines = content.strip().split('\n')
     for i, line in enumerate(lines[:5]):
         if line.startswith("# "):
             generated_title = line.replace("# ", "").strip()
+            # Remove title from content to avoid duplication
             content = "\n".join(lines[i+1:]).strip()
             break
 
     slug = re.sub(r'[^a-z0-9]+', '-', generated_title.lower()).strip('-')
     
-    # Final check for duplicate slug
+    # Check for duplicate slug
     if any(p.get('slug') == slug for p in posts):
+        logger.info(f"Skipping duplicate post: {slug}")
         return False
 
     category = random.choice(CATEGORIES)
     if not image_url:
-        # High quality tech image fallback with unique seeds
         seed = random.randint(1, 1000)
         image_url = f"https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=1200&h=630&sig={seed}"
 
     new_post = {
-        "id": str(len(posts) + 1),
+        "id": str(uuid.uuid4()),
         "title": generated_title,
         "slug": slug,
         "content": content,
@@ -167,43 +211,51 @@ def save_post(title, content, original_link, source, image_url=None):
     }
     
     posts.insert(0, new_post)
+    
+    # Keep only latest 100 posts to check file size
+    if len(posts) > 100:
+        posts = posts[:100]
+
     with open(posts_file, "w") as f:
         json.dump(posts, f, indent=2)
+    
+    logger.info(f"Saved new post: {generated_title}")
     return True
 
 def main():
+    logger.info("Starting Daily AI Blog Generator...")
     articles = fetch_latest_news()
+    logger.info(f"Fetched {len(articles)} articles from RSS feeds.")
+    
     random.shuffle(articles)
     
     posts_file = "src/data/posts.json"
     existing_slugs = []
     if os.path.exists(posts_file):
-        with open(posts_file, "r") as f:
-            try: existing_slugs = [p.get('slug') for p in json.load(f)]
-            except: pass
+        try:
+            with open(posts_file, "r") as f:
+                existing_slugs = [p.get('slug') for p in json.load(f)]
+        except: pass
 
     # 1. Try to find a NEW news article
     for article in articles:
         slug = re.sub(r'[^a-z0-9]+', '-', article['title'].lower()).strip('-')
         if slug not in existing_slugs:
-            print(f"Found new news: {article['title']}")
+            logger.info(f"Processing new article: {article['title']}")
             content, source = generate_content(article)
             if content:
                 if save_post(article['title'], content, article['link'], source, article.get('image_url')):
-                    print("Successfully saved news post.")
                     return
 
-    # 2. If no new news, trigger "AI Insight Mode" to guarantee a post
-    print("No new news found. Generating original AI Insight...")
+    # 2. If no new news, trigger "AI Insight Mode"
+    logger.info("No new news found. Generating original AI Insight...")
     content, source = generate_content()
     if content:
-        # Title is the first # header
         title = "The Future of Computing"
         match = re.search(r'^# (.*)', content)
         if match: title = match.group(1)
         
-        if save_post(title, content, "https://github.com/Xavi-003/blog", source):
-            print("Successfully saved AI Insight post.")
+        save_post(title, content, "https://github.com/Xavi-003/blog", source)
 
 if __name__ == "__main__":
     main()

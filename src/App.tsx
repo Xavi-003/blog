@@ -147,6 +147,9 @@ const Home = ({ onOpenSettings, accent }: any) => {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+const [page, setPage] = useState(1);
+  const POSTS_PER_PAGE = 9;
+
   useEffect(() => {
     let filtered = [...posts]
     if (searchQuery.trim()) {
@@ -159,7 +162,10 @@ const Home = ({ onOpenSettings, accent }: any) => {
 
     filtered.sort((a, b) => sortOrder === 'newest' ? new Date(b.date).getTime() - new Date(a.date).getTime() : new Date(a.date).getTime() - new Date(b.date).getTime())
     setDisplayPosts(filtered)
+    setPage(1) // Reset to page 1 when filters change
   }, [posts, searchQuery, activeCategory, activeSource, activeTime, sortOrder])
+
+  const paginatedPosts = displayPosts.slice(0, page * POSTS_PER_PAGE);
 
   const formatDate = (dateStr: string) => new Date(dateStr).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
   
@@ -250,10 +256,10 @@ const Home = ({ onOpenSettings, accent }: any) => {
 
       <main className="container">
         <motion.div variants={containerVariants} initial="hidden" animate="visible" className="doodle-grid">
-          {displayPosts.map((post, index) => (
+          {paginatedPosts.map((post, index) => (
             <motion.div key={post.id} variants={itemVariants} className="doodle-card" whileHover={{y:-8, scale: 1.02}} transition={{ type: 'spring', stiffness: 300 } as any} onClick={() => navigate(`/blog/${post.slug}`)}>
               <div className="doodle-image-box">
-                {index === 0 && sortOrder === 'newest' && <div className="new-badge">NEW</div>}
+                {index === 0 && sortOrder === 'newest' && page === 1 && <div className="new-badge">NEW</div>}
                 {post.image ? <img src={post.image} alt="" /> : <div style={{fontSize: '4rem', opacity: 0.05}}>🤖</div>}
               </div>
               <div className="doodle-info">
@@ -266,6 +272,24 @@ const Home = ({ onOpenSettings, accent }: any) => {
               </div>
             </motion.div>
           ))}
+          {displayPosts.length > paginatedPosts.length && (
+            <div style={{gridColumn: '1/-1', display: 'flex', justifyContent: 'center', marginTop: '2rem'}}>
+                <button 
+                  onClick={() => setPage(p => p + 1)}
+                  style={{
+                    padding: '0.8rem 2rem', 
+                    background: 'var(--primary-color)', 
+                    color: 'white', 
+                    border: 'none', 
+                    borderRadius: '8px', 
+                    cursor: 'pointer',
+                    fontWeight: 600
+                  }}
+                >
+                  Load More
+                </button>
+            </div>
+          )}
           {displayPosts.length === 0 && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ gridColumn: '1/-1', textAlign: 'center', padding: '5rem', color: 'var(--text-muted)' }}>
               <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🔍</div>

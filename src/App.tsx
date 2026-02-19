@@ -7,13 +7,15 @@ import {
   ArrowLeft, Zap, ChevronUp, Settings, Sun, Moon, Clock, Globe, Info
 } from 'lucide-react'
 import './App.css'
-import postsData from './data/posts.json'
+import postsDataRaw from './data/posts.json'
 
 interface Post {
   id: string; slug: string; title: string; content: string; date: string; 
   original_link: string; image: string | null; category: string;
   source: string; reading_time: string;
 }
+
+const postsData = postsDataRaw as Post[];
 
 const COLORS = [
   { name: 'Google Blue', value: '#4285f4' },
@@ -65,8 +67,8 @@ const SettingsPanel = ({ isOpen, onClose, theme, setTheme, accent, setAccent }: 
 // --- HOME LIST PAGE ---
 const Home = ({ onOpenSettings }: any) => {
   const navigate = useNavigate();
-  const [posts] = useState<Post[]>(postsData as Post[])
-  const [displayPosts, setDisplayPosts] = useState<Post[]>(postsData as Post[])
+  const [posts] = useState<Post[]>(postsData)
+  const [displayPosts, setDisplayPosts] = useState<Post[]>(postsData)
   const [isScrolled, setIsScrolled] = useState(false)
   const [showScrollTop, setShowScrollTop] = useState(false)
   

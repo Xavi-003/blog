@@ -68,8 +68,25 @@ def generate_content(article=None):
     if not os.getenv("GEMINI_API_KEY"):
         return None, None
     
+    # Debug: List available models
+    try:
+        print("Listing available models...")
+        for m in genai.list_models():
+            if 'generateContent' in m.supported_generation_methods:
+                print(f"Available Model: {m.name}")
+    except Exception as e:
+        print(f"Could not list models: {e}")
+
     # Try different model names to avoid 404 errors
-    models_to_try = ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-pro']
+    models_to_try = [
+        'gemini-1.5-flash', 
+        'gemini-1.5-flash-latest',
+        'gemini-1.5-pro', 
+        'gemini-pro',
+        'models/gemini-1.5-flash',
+        'models/gemini-1.5-pro',
+        'models/gemini-pro'
+    ]
     
     if article:
         prompt = f"""

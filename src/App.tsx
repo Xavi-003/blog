@@ -326,14 +326,15 @@ function App() {
   }, [theme])
 
   useEffect(() => {
-    document.documentElement.style.setProperty('--primary-color', accent)
+    document.documentElement.style.setProperty('--primary-color', accent, 'important')
     localStorage.setItem('accent', accent)
     
-    // Fallback for some browsers/situations: inject style tag
-    let styleTag = document.getElementById('dynamic-accent-style');
+    // Global fallback
+    const styleId = 'dynamic-accent-vars';
+    let styleTag = document.getElementById(styleId) as HTMLStyleElement;
     if (!styleTag) {
       styleTag = document.createElement('style');
-      styleTag.id = 'dynamic-accent-style';
+      styleTag.id = styleId;
       document.head.appendChild(styleTag);
     }
     styleTag.innerHTML = `:root { --primary-color: ${accent} !important; }`;

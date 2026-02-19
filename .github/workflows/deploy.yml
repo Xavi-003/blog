@@ -33,27 +33,40 @@ jobs:
       - name: Install Python dependencies
         run: pip install -r requirements.txt
 
-      - name: 🤖 RUN BLOG GENERATOR
+      - name: 🤖 GENERATE AND PUSH BLOG POST
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
-          echo "Starting Python Script..."
-          python3 generate_post.py
-
-      - name: 🚀 COMMIT AND PUSH NEW POST
-        run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add src/data/posts.json
-          git status
-          if ! git diff --staged --quiet; then
-            echo "Changes detected, committing..."
-            git commit -m "bot: automated blog update $(date +'%Y-%m-%d %H:%M:%S')"
-            git pull --rebase origin main
-            git push origin main
-          else
-            echo "No new blog posts generated."
-          fi
+          
+          # Attempt to generate and push up to 3 times to handle race conditions
+          for i in {1..3}; do
+            echo "Attempt $i..."
+            git pull origin main
+            
+            echo "Running generator..."
+            python3 generate_post.py
+            
+            git add src/data/posts.json
+            if ! git diff --staged --quiet; then
+              echo "New content generated, committing..."
+              git commit -m "bot: automated blog update $(date +'%Y-%m-%d %H:%M:%S')"
+              if git push origin main; then
+                echo "Successfully pushed to main!"
+                exit 0
+              fi
+            else
+              echo "No new unique blog posts to add."
+              exit 0
+            fi
+            
+            echo "Push failed (likely a conflict), resetting and retrying in 5s..."
+            git reset --hard HEAD~1
+            sleep 5
+          done
+          echo "Failed to push after 3 attempts."
+          exit 1
 
       - name: Set up Node.js
         uses: actions/setup-node@v4

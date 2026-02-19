@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { BrowserRouter as Router, Routes, Route, useParams, useNavigate, Link } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, useParams, useNavigate, Link, useLocation } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
@@ -24,6 +24,30 @@ const COLORS = [
   { name: 'Sunset', value: '#ef4444' },
   { name: 'Amber', value: '#f59e0b' }
 ]
+
+// --- ANIMATION VARIANTS ---
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1 }
+  }
+}
+
+const itemVariants = {
+  hidden: { y: 20, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: { type: 'spring', stiffness: 100 } as any
+  }
+}
+
+const pageVariants = {
+  initial: { opacity: 0, x: 20 },
+  animate: { opacity: 1, x: 0 },
+  exit: { opacity: 0, x: -20 }
+}
 
 // --- SETTINGS PANEL ---
 const SettingsPanel = ({ isOpen, onClose, theme, setTheme, accent, setAccent }: any) => (
@@ -116,7 +140,7 @@ const Home = ({ onOpenSettings }: any) => {
   }
 
   return (
-    <div className="app-shell" ref={dropdownRef}>
+    <motion.div initial="initial" animate="animate" exit="exit" variants={pageVariants} className="app-shell" ref={dropdownRef}>
       <header className={`home-sticky-header ${isScrolled ? 'visible' : ''}`}>
         <div className="logo" onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})} style={{cursor: 'pointer', marginRight: '2rem'}}>
           <Zap fill="var(--primary-color)" color="var(--primary-color)" size={20} />
@@ -129,11 +153,11 @@ const Home = ({ onOpenSettings }: any) => {
       </header>
 
       <section className={`search-section ${isScrolled ? 'hidden' : ''}`}>
-        <div className="search-pill-container">
+        <motion.div initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="search-pill-container">
           <Search className="search-icon-large" size={24} />
           <input type="text" className="main-search-bar" placeholder="Search the AI Library" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
           <button className="search-button-blue">Search <ArrowRight size={18} /></button>
-        </div>
+        </motion.div>
 
         <AnimatePresence>
           {(searchQuery || activeCategory || activeSource || activeTime) && (
@@ -176,9 +200,9 @@ const Home = ({ onOpenSettings }: any) => {
       </div>
 
       <main className="container">
-        <div className="doodle-grid">
+        <motion.div variants={containerVariants} initial="hidden" animate="visible" className="doodle-grid">
           {displayPosts.map(post => (
-            <motion.div key={post.id} className="doodle-card" whileHover={{y:-4}} onClick={() => navigate(`/blog/${post.slug}`)}>
+            <motion.div key={post.id} variants={itemVariants} className="doodle-card" whileHover={{y:-8, scale: 1.02}} transition={{ type: 'spring', stiffness: 300 } as any} onClick={() => navigate(`/blog/${post.slug}`)}>
               <div className="doodle-image-box">{post.image ? <img src={post.image} alt="" /> : <div style={{fontSize: '4rem', opacity: 0.05}}>🤖</div>}</div>
               <div className="doodle-info">
                 <div className="doodle-date">{formatDate(post.date)} • {post.category}</div>
@@ -190,14 +214,20 @@ const Home = ({ onOpenSettings }: any) => {
               </div>
             </motion.div>
           ))}
-        </div>
+          {displayPosts.length === 0 && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ gridColumn: '1/-1', textAlign: 'center', padding: '5rem', color: 'var(--text-muted)' }}>
+              <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🔍</div>
+              <h3>No insights found. Try a different search or filter.</h3>
+            </motion.div>
+          )}
+        </motion.div>
       </main>
 
       <div className="floating-ui">
-        {showScrollTop && <div className="fab" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}><ChevronUp size={24} /></div>}
+        {showScrollTop && <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="fab" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}><ChevronUp size={24} /></motion.div>}
         <div className="fab fab-settings" onClick={onOpenSettings}><Settings size={24} /></div>
       </div>
-    </div>
+    </motion.div>
   )
 }
 
@@ -207,15 +237,30 @@ const EditorialPage = () => {
   useEffect(() => { window.scrollTo(0, 0); if (post) document.title = post.title; }, [post]);
   if (!post) return <div style={{ padding: '5rem', textAlign: 'center' }}>Post not found.</div>;
   return (
-    <div className="editorial-page">
+    <motion.div initial="initial" animate="animate" exit="exit" variants={pageVariants} className="editorial-page">
       <nav className="editorial-nav">
         <Link to="/" className="editorial-back-btn"><ArrowLeft size={18} /> BACK</Link>
         <div style={{display: 'flex', gap: '1rem', alignItems: 'center'}}><Zap fill="var(--primary-color)" color="var(--primary-color)" size={18} /><span style={{fontSize: '0.8rem', fontWeight: 800, color: 'var(--primary-color)'}}>AI INSIGHTS</span></div>
       </nav>
-      <header className="editorial-header"><span className="editorial-category">{post.category}</span><h1 className="editorial-title">{post.title}</h1></header>
-      {post.image && <div className="editorial-hero-frame"><img src={post.image} alt="" /></div>}
-      <article className="editorial-body"><ReactMarkdown>{post.content}</ReactMarkdown></article>
-    </div>
+      <header className="editorial-header">
+        <motion.span initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }} className="editorial-category">{post.category}</motion.span>
+        <motion.h1 initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }} className="editorial-title">{post.title}</motion.h1>
+      </header>
+      {post.image && (
+        <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.4 }} className="editorial-hero-frame">
+          <img src={post.image} alt="" />
+        </motion.div>
+      )}
+      <motion.article initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.5 }} className="editorial-body">
+        <ReactMarkdown>{post.content}</ReactMarkdown>
+        <div style={{ marginTop: '4rem', padding: '2rem', background: 'var(--bg-white)', borderRadius: '16px', border: '1px solid var(--card-border)' }}>
+          <h3 style={{ marginBottom: '1rem' }}>Original Source</h3>
+          <a href={post.original_link} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary-color)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+             Read full article on {post.source} <ArrowRight size={16} />
+          </a>
+        </div>
+      </motion.article>
+    </motion.div>
   )
 }
 
@@ -223,6 +268,7 @@ function App() {
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light')
   const [accent, setAccent] = useState(localStorage.getItem('accent') || '#4285f4')
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+  const location = useLocation();
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
@@ -235,14 +281,22 @@ function App() {
   }, [accent])
 
   return (
-    <Router basename="/blog">
+    <>
       <SettingsPanel isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} theme={theme} setTheme={setTheme} accent={accent} setAccent={setAccent} />
-      <Routes>
-        <Route path="/" element={<Home onOpenSettings={() => setIsSettingsOpen(true)} />} />
-        <Route path="/blog/:slug" element={<EditorialPage />} />
-      </Routes>
-    </Router>
+      <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
+          <Route path="/" element={<Home onOpenSettings={() => setIsSettingsOpen(true)} />} />
+          <Route path="/blog/:slug" element={<EditorialPage />} />
+        </Routes>
+      </AnimatePresence>
+    </>
   )
 }
 
-export default App
+export default function Root() {
+  return (
+    <Router basename="/blog">
+      <App />
+    </Router>
+  )
+}

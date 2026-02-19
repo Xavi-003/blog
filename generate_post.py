@@ -222,7 +222,9 @@ def save_post(title, content, original_link, source, image_url=None):
     return True
 
 def main():
-    logger.info("Starting Daily AI Blog Generator...")
+    POSTS_PER_RUN = 3  # Generate multiple posts per workflow run
+    
+    logger.info(f"Starting AI Blog Generator — Target: {POSTS_PER_RUN} posts...")
     articles = fetch_latest_news()
     logger.info(f"Fetched {len(articles)} articles from RSS feeds.")
     
@@ -237,32 +239,44 @@ def main():
         except:
             pass
 
-    # 1. Try to find a NEW news article
+    saved_count = 0
+
+    # 1. Try to generate from NEW news articles first
     for article in articles:
+        if saved_count >= POSTS_PER_RUN:
+            break
         slug = re.sub(r'[^a-z0-9]+', '-', article['title'].lower()).strip('-')
         if slug not in existing_slugs:
             logger.info(f"Processing new article: {article['title']}")
             content, source = generate_content(article)
             if content:
                 if save_post(article['title'], content, article['link'], source, article.get('image_url')):
-                    return
+                    saved_count += 1
+                    existing_slugs.append(slug)
+                    logger.info(f"Post {saved_count}/{POSTS_PER_RUN} saved from news.")
 
-    # 2. If no new news, trigger "AI Insight Mode"
-    logger.info("No new news found. Generating original AI Insight...")
-    
-    for attempt in range(3):
-        content, source = generate_content()
-        if content:
-            title = "The Future of Computing"
-            match = re.search(r'^# (.*)', content)
-            if match:
-                title = match.group(1)
-            
-            if save_post(title, content, "https://github.com/Xavi-003/blog", source):
-                logger.info("AI Insight generated and saved successfully.")
-                return
-            else:
-                logger.warning(f"Generated duplicate AI Insight (Attempt {attempt+1}/3). Retrying...")
+    # 2. Fill remaining slots with AI Insight posts
+    if saved_count < POSTS_PER_RUN:
+        remaining = POSTS_PER_RUN - saved_count
+        logger.info(f"Generating {remaining} AI Insight post(s) to fill quota...")
+        
+        for attempt in range(remaining + 2):  # Extra attempts for duplicates
+            if saved_count >= POSTS_PER_RUN:
+                break
+            content, source = generate_content()
+            if content:
+                title = "The Future of Computing"
+                match = re.search(r'^# (.*)', content)
+                if match:
+                    title = match.group(1)
+                
+                if save_post(title, content, "https://github.com/Xavi-003/blog", source):
+                    saved_count += 1
+                    logger.info(f"AI Insight {saved_count}/{POSTS_PER_RUN} saved.")
+                else:
+                    logger.warning(f"Duplicate AI Insight, retrying...")
+
+    logger.info(f"Run complete. Generated {saved_count} new post(s).")
 
 if __name__ == "__main__":
     main()

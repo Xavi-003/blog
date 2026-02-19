@@ -104,37 +104,46 @@ def fetch_latest_news():
     return articles
 
 def get_available_models():
-    """Discover available Gemini models and return sorted by cost (cheapest first)."""
+    """Discover available Gemini models, sorted cheapest first."""
     preferred_order = [
         'gemini-2.0-flash-lite',
         'gemini-2.0-flash',
-        'gemini-1.5-flash',
         'gemini-1.5-flash-latest',
-        'gemini-2.0-flash-exp',
     ]
-    available = []
     try:
+        available = []
         for m in genai.list_models():
-            if 'generateContent' in [method.name for method in m.supported_generation_methods]:
+            # supported_generation_methods is a list of strings like ['generateContent']
+            methods = m.supported_generation_methods
+            if 'generateContent' in methods:
                 name = m.name.replace('models/', '')
                 available.append(name)
+        
+        # Sort by our preferred order (cheapest first)
+        sorted_models = [m for m in preferred_order if m in available]
+        for m in available:
+            if 'flash' in m and m not in sorted_models:
+                sorted_models.append(m)
+        
+        result = sorted_models[:4] if sorted_models else preferred_order[:2]
+        logger.info(f"Available models: {result}")
+        return result
     except Exception as e:
         logger.warning(f"Could not list models: {e}. Using defaults.")
-        return ['gemini-2.0-flash-lite', 'gemini-2.0-flash']
-    
-    # Sort by preferred order (cheapest first)
-    sorted_models = [m for m in preferred_order if m in available]
-    # Add any other available flash models not in our preferred list
-    for m in available:
-        if 'flash' in m and m not in sorted_models:
-            sorted_models.append(m)
-    
-    logger.info(f"Available models (cheapest first): {sorted_models[:5]}")
-    return sorted_models[:5] if sorted_models else ['gemini-2.0-flash-lite']
+        return preferred_order[:2]
+
+# Global flag — when True, skip all API calls for this run
+_rate_limited = False
 
 def generate_content(article=None, models=None):
+    global _rate_limited
+    
+    if _rate_limited:
+        logger.info("⏸ Skipping — API quota exhausted for this run.")
+        return None, None
+    
     if not os.getenv("GEMINI_API_KEY"):
-        logger.error("Skipping content generation: No API Key")
+        logger.error("Skipping: No API Key")
         return None, None
     
     if models is None:
@@ -175,18 +184,20 @@ def generate_content(article=None, models=None):
             logger.info(f"Using model: {model_name}...")
             model = genai.GenerativeModel(f"models/{model_name}")
             response = model.generate_content(prompt)
-            logger.info(f"✅ Content generated with {model_name}")
+            logger.info(f"✅ Generated with {model_name}")
             return response.text, (article['source'] if article else "AI Synthesis")
 
         except Exception as e:
             error_msg = str(e)
             if "429" in error_msg or "quota" in error_msg.lower():
-                logger.warning(f"Rate limited on {model_name}. Waiting 45s...")
-                time.sleep(45)
+                logger.warning(f"Rate limited on {model_name}.")
             else:
                 logger.warning(f"{model_name} failed: {e}")
             continue
-            
+    
+    # All models failed — mark as rate limited so we stop trying
+    logger.warning("⛔ All models exhausted. Stopping for this run.")
+    _rate_limited = True
     return None, None
 
 def save_post(title, content, original_link, source, image_url=None):

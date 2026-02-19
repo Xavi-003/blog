@@ -250,9 +250,12 @@ const Home = ({ onOpenSettings, accent }: any) => {
 
       <main className="container">
         <motion.div variants={containerVariants} initial="hidden" animate="visible" className="doodle-grid">
-          {displayPosts.map(post => (
+          {displayPosts.map((post, index) => (
             <motion.div key={post.id} variants={itemVariants} className="doodle-card" whileHover={{y:-8, scale: 1.02}} transition={{ type: 'spring', stiffness: 300 } as any} onClick={() => navigate(`/blog/${post.slug}`)}>
-              <div className="doodle-image-box">{post.image ? <img src={post.image} alt="" /> : <div style={{fontSize: '4rem', opacity: 0.05}}>🤖</div>}</div>
+              <div className="doodle-image-box">
+                {index === 0 && sortOrder === 'newest' && <div className="new-badge">NEW</div>}
+                {post.image ? <img src={post.image} alt="" /> : <div style={{fontSize: '4rem', opacity: 0.05}}>🤖</div>}
+              </div>
               <div className="doodle-info">
                 <div className="doodle-date" style={{ color: post.color }}>{formatDate(post.date)} • {post.category}</div>
                 <h2 className="doodle-title">{post.title}</h2>

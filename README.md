@@ -1,73 +1,44 @@
-# React + TypeScript + Vite
+# AI Blog - Automated Tech Insights
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+An automated blog system that fetches the latest tech news from RSS feeds and generates insightful blog posts using Google's Gemini AI.
 
-Currently, two official plugins are available:
+## ℹ️ About
+This project is a modern, responsive blog application built with React, TypeScript, and Vite. It features:
+- **Automated Content Generation:** A Python script fetches news from TechCrunch, The Verge, and Wired.
+- **AI-Powered Summaries:** Uses Gemini 1.5 Flash to generate catchy, markdown-formatted blog posts.
+- **Dynamic UI:** A fluid, interactive interface with theme customization (Light/Dark) and accent colors.
+- **CI/CD Integration:** Automatically updates and deploys to GitHub Pages daily via GitHub Actions.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Releases
 
-## React Compiler
+### v1.0.0 (2026-02-19)
+- Initial release of the automated AI blog.
+- Integrated RSS feed fetching and Gemini AI generation.
+- Implemented responsive React frontend with Framer Motion animations.
+- Set up GitHub Actions for daily automated deployments.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## 🛠️ Tech Stack
+- **Frontend:** React, TypeScript, Vite, Framer Motion, Lucide React
+- **Backend:** Python (Feedparser, Google Generative AI)
+- **Deployment:** GitHub Actions, GitHub Pages
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 📦 Getting Started
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+1. **Install Dependencies:**
+   ```bash
+   npm install
+   pip install -r requirements.txt
+   ```
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+2. **Run Locally:**
+   ```bash
+   npm run dev
+   ```
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+3. **Generate a Post:**
+   ```bash
+   export GEMINI_API_KEY=your_api_key
+   python generate_post.py
+   ```

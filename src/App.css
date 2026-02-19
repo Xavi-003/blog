@@ -66,7 +66,7 @@ body {
 .doodle-image-box { background-color: var(--light-gray); height: 240px; display: flex; align-items: center; justify-content: center; padding: 1.5rem; overflow: hidden; }
 .doodle-image-box img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; }
 .doodle-info { padding: 1.5rem 2rem; border-top: 1px solid var(--card-border); }
-.doodle-date { color: var(--text-muted); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+.doodle-date { color: var(--primary-color); font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
 .doodle-title { font-size: 1.3rem; font-weight: 700; color: var(--text-dark); line-height: 1.3; }
 
 /* --- EDITORIAL PAGE REDESIGN --- */
@@ -84,6 +84,7 @@ body {
 .editorial-meta-wrap { display: flex; justify-content: center; gap: 2rem; margin-top: 2rem; color: var(--text-muted); font-size: 0.9rem; font-weight: 600; }
 .meta-item { display: flex; align-items: center; gap: 0.5rem; }
 
+.editorial-category { color: var(--primary-color); font-weight: 800; text-transform: uppercase; font-size: 0.9rem; margin-bottom: 1rem; display: block; letter-spacing: 0.1em; }
 .editorial-title-xl { 
   font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 900; line-height: 1.05; 
   letter-spacing: -0.04em; max-width: 1000px; margin: 0 auto; color: var(--text-dark);

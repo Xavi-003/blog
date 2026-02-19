@@ -13,7 +13,7 @@ import postsDataRaw from './data/posts.json'
 interface Post {
   id: string; slug: string; title: string; content: string; date: string; 
   original_link: string; image: string | null; category: string;
-  source: string; reading_time: string;
+  source: string; reading_time: string; color: string;
 }
 
 const postsData = postsDataRaw as Post[];
@@ -217,7 +217,7 @@ const Home = ({ onOpenSettings }: any) => {
             <motion.div key={post.id} variants={itemVariants} className="doodle-card" whileHover={{y:-8, scale: 1.02}} transition={{ type: 'spring', stiffness: 300 } as any} onClick={() => navigate(`/blog/${post.slug}`)}>
               <div className="doodle-image-box">{post.image ? <img src={post.image} alt="" /> : <div style={{fontSize: '4rem', opacity: 0.05}}>🤖</div>}</div>
               <div className="doodle-info">
-                <div className="doodle-date">{formatDate(post.date)} • {post.category}</div>
+                <div className="doodle-date" style={{ color: post.color }}>{formatDate(post.date)} • {post.category}</div>
                 <h2 className="doodle-title">{post.title}</h2>
                 <div style={{marginTop: '1rem', display: 'flex', gap: '1rem', fontSize: '0.75rem', color: 'var(--text-muted)'}}>
                    <span style={{display: 'flex', alignItems: 'center', gap: '0.3rem'}}><Globe size={12}/> {post.source}</span>

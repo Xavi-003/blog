@@ -90,7 +90,7 @@ const SettingsPanel = ({ isOpen, onClose, theme, setTheme, accent, setAccent }: 
 )
 
 // --- HOME LIST PAGE ---
-const Home = ({ onOpenSettings }: any) => {
+const Home = ({ onOpenSettings, accent }: any) => {
   const navigate = useNavigate();
   const [posts] = useState<Post[]>(postsData)
   const [displayPosts, setDisplayPosts] = useState<Post[]>(postsData)
@@ -141,7 +141,15 @@ const Home = ({ onOpenSettings }: any) => {
   }
 
   return (
-    <motion.div initial="initial" animate="animate" exit="exit" variants={pageVariants} className="app-shell" ref={dropdownRef}>
+    <motion.div 
+      initial="hidden" 
+      animate="visible" 
+      exit="exit" 
+      variants={pageVariants} 
+      className="app-shell" 
+      ref={dropdownRef}
+      style={{ '--primary-color': accent } as any}
+    >
       <header className={`home-sticky-header ${isScrolled ? 'visible' : ''}`}>
         <div className="logo" onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})} style={{cursor: 'pointer', marginRight: '2rem'}}>
           <Zap fill="var(--primary-color)" color="var(--primary-color)" size={20} />
@@ -243,7 +251,7 @@ const Home = ({ onOpenSettings }: any) => {
   )
 }
 
-const EditorialPage = () => {
+const EditorialPage = ({ accent }: any) => {
   const { slug } = useParams();
   const post = postsData.find(p => p.slug === slug);
   const [readingProgress, setReadingProgress] = useState(0);
@@ -267,7 +275,14 @@ const EditorialPage = () => {
   const formatDate = (dateStr: string) => new Date(dateStr).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
 
   return (
-    <motion.div initial="initial" animate="animate" exit="exit" variants={pageVariants} className="editorial-page">
+    <motion.div 
+      initial="hidden" 
+      animate="visible" 
+      exit="exit" 
+      variants={pageVariants} 
+      className="editorial-page"
+      style={{ '--primary-color': accent } as any}
+    >
       <div className="reading-progress-container">
         <div className="reading-progress-bar" style={{ width: `${readingProgress}%` }}></div>
       </div>
@@ -345,8 +360,8 @@ function App() {
       <SettingsPanel isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} theme={theme} setTheme={setTheme} accent={accent} setAccent={setAccent} />
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
-          <Route path="/" element={<Home onOpenSettings={() => setIsSettingsOpen(true)} />} />
-          <Route path="/blog/:slug" element={<EditorialPage />} />
+          <Route path="/" element={<Home onOpenSettings={() => setIsSettingsOpen(true)} accent={accent} />} />
+          <Route path="/blog/:slug" element={<EditorialPage accent={accent} />} />
         </Routes>
       </AnimatePresence>
     </>

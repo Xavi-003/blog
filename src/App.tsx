@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, useParams, useNavigate, Link, u
 import ReactMarkdown from 'react-markdown'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
-  Search, ArrowRight, ChevronDown, X, Calendar, LayoutGrid,
+  ArrowRight, ChevronDown, X, Calendar, LayoutGrid,
   ArrowLeft, Zap, ChevronUp, Settings, Sun, Moon, Clock, Globe, Info,
   Github, Linkedin, ExternalLink
 } from 'lucide-react'
@@ -187,8 +187,7 @@ const Home = ({ onOpenSettings, accent }: any) => {
           <b style={{fontSize: '0.8rem', letterSpacing: '0.05em'}}>AI<span>BLOG</span></b>
         </div>
         <div className="compact-search">
-          <Search style={{position: 'absolute', left: '0.8rem', color: 'var(--text-muted)'}} size={18} />
-          <input type="text" className="compact-input" placeholder="Search AI insights..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+          <input type="text" className="compact-input" placeholder="Search AI insights..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} style={{ paddingLeft: '1.2rem' }} />
         </div>
         <div className="header-connect-icons">
           <a href="https://github.com/Xavi-003" target="_blank" rel="noopener noreferrer" title="GitHub"><Github size={20} /></a>
@@ -199,8 +198,7 @@ const Home = ({ onOpenSettings, accent }: any) => {
 
       <section className={`search-section ${isScrolled ? 'hidden' : ''}`} style={{position: 'relative'}}>
         <motion.div initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="search-pill-container">
-          <Search className="search-icon-large" size={24} />
-          <input type="text" className="main-search-bar" placeholder="Search the AI Library" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+          <input type="text" className="main-search-bar" placeholder="Search the AI Library" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} style={{ paddingLeft: '2rem' }} />
           <button className="search-button-blue">Search <ArrowRight size={18} /></button>
         </motion.div>
 

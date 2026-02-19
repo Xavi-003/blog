@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Search, ArrowRight, ChevronDown, X, Calendar, LayoutGrid,
   ArrowLeft, Zap, ChevronUp, Settings, Sun, Moon, Clock, Globe, Info,
-  Github, Linkedin, ExternalLink
+  Github, Linkedin, ExternalLink, Loader2
 } from 'lucide-react'
 import './App.css'
 import postsDataRaw from './data/posts.json'
@@ -50,6 +50,31 @@ const pageVariants = {
   exit: { opacity: 0, x: -20 }
 }
 
+// --- LOADING SCREEN ---
+const LoadingScreen = () => (
+  <motion.div 
+    initial={{ opacity: 1 }} 
+    exit={{ opacity: 0 }} 
+    style={{ 
+      position: 'fixed', inset: 0, background: 'var(--bg-white)', 
+      display: 'flex', flexDirection: 'column', alignItems: 'center', 
+      justifyContent: 'center', zIndex: 9999 
+    }}
+  >
+    <motion.div
+      animate={{ rotate: 360 }}
+      transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+      style={{ marginBottom: '1.5rem' }}
+    >
+      <Zap size={48} fill="var(--primary-color)" color="var(--primary-color)" />
+    </motion.div>
+    <h2 style={{ fontWeight: 800, letterSpacing: '0.1em', fontSize: '1.5rem' }}>
+      AI<span style={{ color: 'var(--primary-color)' }}>BLOG</span> PRO
+    </h2>
+    <p style={{ color: 'var(--text-muted)', marginTop: '0.5rem', fontWeight: 600 }}>Synthesizing latest tech insights...</p>
+  </motion.div>
+)
+
 // --- SETTINGS PANEL ---
 const SettingsPanel = ({ isOpen, onClose, theme, setTheme, accent, setAccent }: any) => (
   <AnimatePresence>
@@ -79,7 +104,13 @@ const SettingsPanel = ({ isOpen, onClose, theme, setTheme, accent, setAccent }: 
             <p style={{ fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase', marginBottom: '1.2rem', color: 'var(--text-muted)' }}>Accent Color</p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
               {COLORS.map(c => (
-                <div key={c.value} onClick={() => setAccent(c.value)} className={`color-option ${accent === c.value ? 'active' : ''}`} style={{ background: c.value }} title={c.name} />
+                <div 
+                  key={c.value} 
+                  onClick={() => setAccent(c.value)} 
+                  className={`color-option ${accent === c.value ? 'active' : ''}`} 
+                  style={{ background: c.value }} 
+                  title={c.name} 
+                />
               ))}
             </div>
           </div>
@@ -333,7 +364,14 @@ function App() {
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light')
   const [accent, setAccent] = useState(localStorage.getItem('accent') || '#4285f4')
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const location = useLocation();
+
+  useEffect(() => {
+    // Simulate content synthesis delay for the loading screen
+    const timer = setTimeout(() => setIsLoading(false), 1500)
+    return () => clearTimeout(timer)
+  }, [])
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
@@ -357,7 +395,12 @@ function App() {
 
   return (
     <>
+      <AnimatePresence mode="wait">
+        {isLoading && <LoadingScreen key="loader" />}
+      </AnimatePresence>
+
       <SettingsPanel isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} theme={theme} setTheme={setTheme} accent={accent} setAccent={setAccent} />
+      
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<Home onOpenSettings={() => setIsSettingsOpen(true)} accent={accent} />} />

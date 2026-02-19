@@ -1,4 +1,5 @@
 import os
+import time
 import requests
 import feedparser
 import google.generativeai as genai
@@ -108,9 +109,8 @@ def generate_content(article=None):
         return None, None
     
     models_to_try = [
-        'models/gemini-2.0-flash',
         'models/gemini-2.0-flash-lite',
-        'models/gemini-flash-latest',
+        'models/gemini-2.0-flash',
         'models/gemini-1.5-flash'
     ]
     
@@ -147,13 +147,18 @@ def generate_content(article=None):
 
     for model_name in models_to_try:
         try:
-            logger.info(f"Attempting generation with model: {model_name}...")
+            logger.info(f"Trying model: {model_name}...")
             model = genai.GenerativeModel(model_name)
             response = model.generate_content(prompt)
             return response.text, (article['source'] if article else "AI Synthesis")
 
         except Exception as e:
-            logger.warning(f"Model {model_name} failed: {e}")
+            error_msg = str(e)
+            if "429" in error_msg or "quota" in error_msg.lower():
+                logger.warning(f"Rate limited on {model_name}. Waiting 45s...")
+                time.sleep(45)
+            else:
+                logger.warning(f"Model {model_name} failed: {e}")
             continue
             
     return None, None

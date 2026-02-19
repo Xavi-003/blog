@@ -128,22 +128,28 @@ def generate_content(article=None):
         5. Use bold text and bullet points.
         """
     else:
+    else:
         # AI Insight Mode
         topic = random.choice([
-            "The Quantum Computing Breakthrough of 2026",
-            "Next-Gen Solid State Battery Technology",
-            "The Rise of Local LLMs on Mobile Hardware",
-            "Neuralink and the Future of Brain-Computer Interfaces",
-            "Sustainable Semi-Conductor Manufacturing",
-            "The Evolution of Generative Video Models"
+            "The Rise of Autonomous AI Agents in 2026",
+            "Breakthroughs in Solid State Batteries for EVs",
+            "Local LLMs: Running 70B Models on Consumer Hardware",
+            "Neuralink's Next Generation Brain Chip Architecture",
+            "Sustainable Computing: Green Data Centers",
+            "Generative Video: From Clips to Full Movies",
+            "The End of Smartphones? AI Wearables Take Over",
+            "Quantum Internet: First Practical nodes",
+            "Rust in the Linux Kernel: A Progress Report",
+            "WebAssembly (Wasm) and the Future of Cloud Computing"
         ])
         prompt = f"""
-        Generate a deep-dive technical "AI Insight" post about {topic}.
+        Generate a breaking news style technical blog post about: {topic}.
         
         STRICT GUIDELINES:
-        1. Write a 700-word visionary analysis.
-        2. Use Markdown: # Title, ## Overview, ## The Core Technology, ## Future Outlook, ## Strategic Importance.
+        1. Write a 700-word visionary analysis as if this technology just had a major breakthrough.
+        2. Use Markdown: # Title, ## The Breakthrough, ## How It Works, ## Industry Impact, ## Future Outlook.
         3. End with: "--- SOURCE: AI Intelligence Synthesis"
+        4. Tone: Professional, Excited, Technical.
         """
 
     for model_name in models_to_try:
@@ -152,6 +158,7 @@ def generate_content(article=None):
             model = genai.GenerativeModel(model_name)
             response = model.generate_content(prompt)
             return response.text, (article['source'] if article else "AI Synthesis")
+
         except Exception as e:
             logger.warning(f"Model {model_name} failed: {e}")
             continue

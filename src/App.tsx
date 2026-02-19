@@ -83,21 +83,6 @@ const SettingsPanel = ({ isOpen, onClose, theme, setTheme, accent, setAccent }: 
               ))}
             </div>
           </div>
-
-          <div style={{ marginTop: 'auto', paddingTop: '2.5rem', borderTop: '1px solid var(--card-border)' }}>
-            <p style={{ fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase', marginBottom: '1.2rem', color: 'var(--text-muted)' }}>Developer Connect</p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <a href="https://github.com/Xavi-003" target="_blank" rel="noopener noreferrer" className="connect-link">
-                <Github size={18} /> GitHub Profile
-              </a>
-              <a href="https://linkedin.com/in/antony-xavier" target="_blank" rel="noopener noreferrer" className="connect-link">
-                <Linkedin size={18} /> LinkedIn
-              </a>
-              <a href="https://antony-xavier.com" target="_blank" rel="noopener noreferrer" className="connect-link">
-                <ExternalLink size={18} /> Portfolio
-              </a>
-            </div>
-          </div>
         </motion.div>
       </>
     )}
@@ -166,7 +151,18 @@ const Home = ({ onOpenSettings }: any) => {
           <Search style={{position: 'absolute', left: '0.8rem', color: 'var(--text-muted)'}} size={18} />
           <input type="text" className="compact-input" placeholder="Search AI insights..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
         </div>
+        <div className="header-connect-icons">
+          <a href="https://github.com/Xavi-003" target="_blank" rel="noopener noreferrer" title="GitHub"><Github size={20} /></a>
+          <a href="https://linkedin.com/in/antony-xavier" target="_blank" rel="noopener noreferrer" title="LinkedIn"><Linkedin size={20} /></a>
+          <a href="https://antony-xavier.com" target="_blank" rel="noopener noreferrer" title="Portfolio"><ExternalLink size={20} /></a>
+        </div>
       </header>
+
+      <div className="fixed-header-icons">
+        <a href="https://github.com/Xavi-003" target="_blank" rel="noopener noreferrer" title="GitHub"><Github size={20} /></a>
+        <a href="https://linkedin.com/in/antony-xavier" target="_blank" rel="noopener noreferrer" title="LinkedIn"><Linkedin size={20} /></a>
+        <a href="https://antony-xavier.com" target="_blank" rel="noopener noreferrer" title="Portfolio"><ExternalLink size={20} /></a>
+      </div>
 
       <section className={`search-section ${isScrolled ? 'hidden' : ''}`}>
         <motion.div initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="search-pill-container">

@@ -68,7 +68,8 @@ def generate_content(article=None):
     if not os.getenv("GEMINI_API_KEY"):
         return None, None
     
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    # Try different model names to avoid 404 errors
+    models_to_try = ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-pro']
     
     if article:
         prompt = f"""
@@ -102,12 +103,17 @@ def generate_content(article=None):
         3. End with: "--- SOURCE: AI Intelligence Synthesis"
         """
 
-    try:
-        response = model.generate_content(prompt)
-        return response.text, (article['source'] if article else "AI Synthesis")
-    except Exception as e:
-        print(f"Gemini error: {e}")
-        return None, None
+    for model_name in models_to_try:
+        try:
+            print(f"Attempting to use model: {model_name}...")
+            model = genai.GenerativeModel(model_name)
+            response = model.generate_content(prompt)
+            return response.text, (article['source'] if article else "AI Synthesis")
+        except Exception as e:
+            print(f"Error with model {model_name}: {e}")
+            continue
+            
+    return None, None
 
 def save_post(title, content, original_link, source, image_url=None):
     data_dir = "src/data"

@@ -128,7 +128,6 @@ def generate_content(article=None):
         5. Use bold text and bullet points.
         """
     else:
-    else:
         # AI Insight Mode
         topic = random.choice([
             "The Rise of Autonomous AI Agents in 2026",

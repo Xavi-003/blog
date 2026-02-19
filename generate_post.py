@@ -30,13 +30,22 @@ def fetch_latest_news():
             feed = feedparser.parse(feed_url)
             for entry in feed.entries[:10]:
                 image_url = None
-                if 'media_content' in entry: image_url = entry.media_content[0]['url']
-                elif 'media_thumbnail' in entry: image_url = entry.media_thumbnail[0]['url']
-                elif 'links' in entry:
+                if 'media_content' in entry and entry.media_content:
+                    image_url = entry.media_content[0].get('url')
+                if not image_url and 'media_thumbnail' in entry and entry.media_thumbnail:
+                    image_url = entry.media_thumbnail[0].get('url')
+                if not image_url and 'links' in entry:
                     for link in entry.links:
-                        if link.type.startswith('image/'):
-                            image_url = link.href
+                        if link.get('type', '').startswith('image/'):
+                            image_url = link.get('href')
                             break
+                if not image_url and 'content' in entry:
+                    # Try to find img tag in content
+                    import re
+                    match = re.search(r'<img src="(.*?)"', entry.content[0].value)
+                    if match:
+                        image_url = match.group(1)
+                
                 articles.append({
                     "title": entry.title,
                     "link": entry.link,

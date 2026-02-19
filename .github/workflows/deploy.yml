@@ -18,60 +18,49 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  generate:
+  generate-and-deploy:
     runs-on: ubuntu-latest
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
+      # --- GENERATE (only on schedule or manual trigger) ---
       - name: Set up Python
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
       - name: Install Python dependencies
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         run: pip install -r requirements.txt
 
-      - name: 🤖 Generate Blog Posts
+      - name: 🤖 Generate 1 New Blog Post
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           
-          for i in {1..3}; do
-            echo "Attempt $i..."
-            git pull origin main
-            python3 generate_post.py
-            
-            git add src/data/posts.json
-            if ! git diff --staged --quiet; then
-              git commit -m "bot: automated blog update $(date +'%Y-%m-%d %H:%M:%S')"
-              if git push origin main; then
-                echo "✅ New posts pushed!"
-                break
-              fi
-            else
-              echo "No new posts to add."
-              break
-            fi
-            
-            git reset --hard HEAD~1
-            sleep 5
-          done
+          git pull origin main
+          python3 generate_post.py
+          
+          git add src/data/posts.json
+          if ! git diff --staged --quiet; then
+            git commit -m "bot: new post $(date +'%Y-%m-%d %H:%M:%S')"
+            git push origin main || echo "Push failed, will deploy existing posts"
+          else
+            echo "No new posts generated."
+          fi
 
-  deploy:
-    runs-on: ubuntu-latest
-    needs: [generate]
-    if: always()
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Checkout (latest)
+      # --- DEPLOY (always runs) ---
+      - name: Checkout latest (after generate)
         uses: actions/checkout@v4
         with:
           ref: main

@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import './App.css'
 import postsDataRaw from './data/posts.json'
+import { useDocumentMeta, generateMetaDescription, DEFAULT_META } from './hooks/useDocumentMeta'
 
 interface Post {
   id: string; slug: string; title: string; content: string; date: string;
@@ -136,6 +137,9 @@ const Home = ({ onOpenSettings, accent }: any) => {
   const dropdownRef = useRef<HTMLDivElement>(null)
   const [page, setPage] = useState(1);
   const POSTS_PER_PAGE = 9;
+
+  // Restore homepage SEO defaults when Home mounts
+  useDocumentMeta(DEFAULT_META);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -299,9 +303,34 @@ const EditorialPage = ({ accent }: any) => {
   const post = postsData.find(p => p.slug === slug);
   const [readingProgress, setReadingProgress] = useState(0);
 
+  const BASE_URL = 'https://xavi-003.github.io/blog';
+
+  // Dynamic SEO meta tags for the individual blog post
+  const postDescription = post ? generateMetaDescription(post.content) : '';
+  useDocumentMeta(
+    post
+      ? {
+        title: `${post.title} | AI Insights Pro`,
+        description: postDescription,
+        keywords: `${post.category}, AI, Technology, ${post.source}`,
+        ogTitle: post.title,
+        ogDescription: postDescription,
+        ogType: 'article',
+        ogImage: post.image || '',
+        ogUrl: `${BASE_URL}/blog/${post.slug}`,
+        twitterCard: post.image ? 'summary_large_image' : 'summary',
+        twitterTitle: post.title,
+        twitterDescription: postDescription,
+        twitterImage: post.image || '',
+        author: `AI Insights Pro — via ${post.source}`,
+        articlePublishedTime: new Date(post.date).toISOString(),
+        canonicalUrl: `${BASE_URL}/blog/${post.slug}`,
+      }
+      : DEFAULT_META
+  );
+
   useEffect(() => {
     window.scrollTo(0, 0);
-    if (post) document.title = `${post.title} | AI Insights Pro`;
     const handleScroll = () => {
       const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
       setReadingProgress((window.scrollY / totalHeight) * 100);

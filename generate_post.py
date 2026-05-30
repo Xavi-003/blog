@@ -292,6 +292,8 @@ def main():
             if content:
                 if save_post(article['title'], content, article['link'], source, article.get('image_url')):
                     logger.info("✅ New post saved from news!")
+                    logger.info("Updating sitemap...")
+                    os.system("node scripts/generate-sitemap.mjs")
                     return
 
     # 2. Fallback: generate AI Insight
@@ -305,6 +307,8 @@ def main():
                 title = match.group(1)
             if save_post(title, content, "https://github.com/Xavi-003/blog", source):
                 logger.info("✅ AI Insight post saved!")
+                logger.info("Updating sitemap...")
+                os.system("node scripts/generate-sitemap.mjs")
                 return
             logger.warning(f"Duplicate, retry {attempt+1}/3...")
 

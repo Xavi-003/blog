@@ -25,6 +25,7 @@ export interface DocumentMeta {
     author?: string;
     articlePublishedTime?: string;
     canonicalUrl?: string;
+    jsonLd?: Record<string, any> | Record<string, any>[];
 }
 
 /** Default homepage SEO values */
@@ -82,6 +83,24 @@ function setMetaTag(attribute: string, key: string, content: string): void {
     element.setAttribute('content', content);
 }
 
+/** Helper to set or create JSON-LD structured data script tag */
+function setJsonLd(data: Record<string, any> | Record<string, any>[] | undefined): void {
+    const id = 'dynamic-json-ld';
+    let script = document.getElementById(id) as HTMLScriptElement | null;
+    
+    if (data) {
+        if (!script) {
+            script = document.createElement('script');
+            script.type = 'application/ld+json';
+            script.id = id;
+            document.head.appendChild(script);
+        }
+        script.textContent = JSON.stringify(data);
+    } else if (script) {
+        script.remove();
+    }
+}
+
 /** Helper to set or create the <link rel="canonical"> tag */
 function setCanonicalLink(url: string): void {
     let element = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
@@ -130,6 +149,9 @@ export function useDocumentMeta(meta: DocumentMeta): void {
         // --- Canonical URL ---
         if (meta.canonicalUrl) setCanonicalLink(meta.canonicalUrl);
 
+        // --- Structured Data ---
+        setJsonLd(meta.jsonLd);
+
         // --- Cleanup: restore defaults on unmount ---
         return () => {
             document.title = DEFAULT_META.title;
@@ -145,11 +167,12 @@ export function useDocumentMeta(meta: DocumentMeta): void {
             setMetaTag('name', 'twitter:title', DEFAULT_META.twitterTitle || '');
             setMetaTag('name', 'twitter:description', DEFAULT_META.twitterDescription || '');
             setMetaTag('name', 'twitter:image', DEFAULT_META.twitterImage || '');
+            setJsonLd(DEFAULT_META.jsonLd);
         };
     }, [
         meta.title, meta.description, meta.keywords, meta.ogTitle, meta.ogDescription,
         meta.ogType, meta.ogImage, meta.ogUrl, meta.twitterCard, meta.twitterTitle,
         meta.twitterDescription, meta.twitterImage, meta.author, meta.articlePublishedTime,
-        meta.canonicalUrl,
+        meta.canonicalUrl, meta.jsonLd,
     ]);
 }

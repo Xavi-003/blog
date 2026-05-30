@@ -325,6 +325,41 @@ const EditorialPage = ({ accent }: any) => {
         author: `AI Insights Pro — via ${post.source}`,
         articlePublishedTime: new Date(post.date).toISOString(),
         canonicalUrl: `${BASE_URL}/blog/${post.slug}`,
+        jsonLd: [
+          {
+            "@context": "https://schema.org",
+            "@type": "Article",
+            "headline": post.title,
+            "image": post.image ? [post.image] : [],
+            "datePublished": new Date(post.date).toISOString(),
+            "author": [{
+                "@type": "Organization",
+                "name": `AI Insights Pro — via ${post.source}`
+            }]
+          },
+          {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": `What is this article about?`,
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": postDescription || `Read our insights about ${post.title}.`
+                }
+              },
+              {
+                "@type": "Question",
+                "name": `What category does "${post.title}" belong to?`,
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": `This article belongs to the ${post.category} category and is based on information from ${post.source}.`
+                }
+              }
+            ]
+          }
+        ]
       }
       : DEFAULT_META
   );

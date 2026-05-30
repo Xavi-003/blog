@@ -374,7 +374,7 @@ const EditorialPage = ({ accent }: any) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [post]);
 
-  if (!post) return <div style={{ padding: '5rem', textAlign: 'center' }}>Post not found.</div>;
+  if (!post) return <NotFoundPage accent={accent} />;
   const formatDate = (dateStr: string) => new Date(dateStr).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
 
   return (
@@ -430,6 +430,43 @@ const EditorialPage = ({ accent }: any) => {
   )
 }
 
+// --- NOT FOUND PAGE ---
+const NotFoundPage = ({ accent }: { accent: string }) => {
+  useDocumentMeta({
+    title: '404 Page Not Found | AI Insights Pro',
+    description: 'The page you are looking for does not exist or has been moved.',
+    robots: 'noindex, follow',
+  });
+
+  return (
+    <div className="not-found-container" style={{ '--primary-color': accent } as any}>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="not-found-icon-box">
+          <motion.div
+            animate={{ y: [0, -10, 0] }}
+            transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" } as any}
+            style={{ fontSize: '5rem' }}
+          >
+            ⚡
+          </motion.div>
+        </div>
+        <h1 className="not-found-title">404</h1>
+        <h2 className="not-found-subtitle">Insight Offline</h2>
+        <p className="not-found-text">
+          The research note or tech briefing you are looking for has either been moved, deleted, or was synthesized in an alternate timeline.
+        </p>
+        <Link to="/" className="not-found-btn">
+          <ArrowLeft size={16} /> Return to Library
+        </Link>
+      </motion.div>
+    </div>
+  );
+};
+
 function App() {
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light')
   const [accent, setAccent] = useState(localStorage.getItem('accent') || '#4285f4')
@@ -466,6 +503,8 @@ function App() {
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<Home onOpenSettings={() => setIsSettingsOpen(true)} accent={accent} />} />
           <Route path="/blog/:slug" element={<EditorialPage accent={accent} />} />
+          <Route path="/404" element={<NotFoundPage accent={accent} />} />
+          <Route path="*" element={<NotFoundPage accent={accent} />} />
         </Routes>
       </AnimatePresence>
     </>

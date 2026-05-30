@@ -26,6 +26,7 @@ export interface DocumentMeta {
     articlePublishedTime?: string;
     canonicalUrl?: string;
     jsonLd?: Record<string, any> | Record<string, any>[];
+    robots?: string;
 }
 
 /** Default homepage SEO values */
@@ -152,6 +153,16 @@ export function useDocumentMeta(meta: DocumentMeta): void {
         // --- Structured Data ---
         setJsonLd(meta.jsonLd);
 
+        // --- Robots Tag ---
+        if (meta.robots) {
+            setMetaTag('name', 'robots', meta.robots);
+        } else {
+            const robotsEl = document.querySelector('meta[name="robots"]');
+            if (robotsEl) {
+                robotsEl.setAttribute('content', 'index, follow');
+            }
+        }
+
         // --- Cleanup: restore defaults on unmount ---
         return () => {
             document.title = DEFAULT_META.title;
@@ -168,11 +179,15 @@ export function useDocumentMeta(meta: DocumentMeta): void {
             setMetaTag('name', 'twitter:description', DEFAULT_META.twitterDescription || '');
             setMetaTag('name', 'twitter:image', DEFAULT_META.twitterImage || '');
             setJsonLd(DEFAULT_META.jsonLd);
+            const robotsEl = document.querySelector('meta[name="robots"]');
+            if (robotsEl) {
+                robotsEl.setAttribute('content', 'index, follow');
+            }
         };
     }, [
         meta.title, meta.description, meta.keywords, meta.ogTitle, meta.ogDescription,
         meta.ogType, meta.ogImage, meta.ogUrl, meta.twitterCard, meta.twitterTitle,
         meta.twitterDescription, meta.twitterImage, meta.author, meta.articlePublishedTime,
-        meta.canonicalUrl, meta.jsonLd,
+        meta.canonicalUrl, meta.jsonLd, meta.robots,
     ]);
 }

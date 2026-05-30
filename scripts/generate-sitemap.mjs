@@ -22,7 +22,14 @@ let sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
   </url>
 `;
 
+const seenSlugs = new Set();
+let uniqueCount = 0;
+
 posts.forEach(post => {
+  if (seenSlugs.has(post.slug)) return;
+  seenSlugs.add(post.slug);
+  uniqueCount++;
+
   // Use post.date, fallback to current date if missing or invalid
   let modDate = new Date().toISOString().split('T')[0];
   if (post.date) {
@@ -43,4 +50,4 @@ posts.forEach(post => {
 sitemapXml += `</urlset>\n`;
 
 fs.writeFileSync(sitemapPath, sitemapXml, 'utf8');
-console.log(`Generated sitemap.xml with ${posts.length + 1} URLs`);
+console.log(`Generated sitemap.xml with ${uniqueCount + 1} unique URLs (1 home + ${uniqueCount} posts)`);

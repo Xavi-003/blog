@@ -20,6 +20,9 @@ concurrency:
 jobs:
   generate-and-deploy:
     runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: "--no-deprecation"
+      NODE_NO_WARNINGS: "1"
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

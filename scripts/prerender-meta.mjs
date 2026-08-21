@@ -22,14 +22,34 @@ const __dirname = dirname(__filename);
 const ROOT = resolve(__dirname, '..');
 const DIST = resolve(ROOT, 'dist');
 const POSTS_PATH = resolve(ROOT, 'src', 'data', 'posts.json');
+const B2B_POSTS_PATH = resolve(ROOT, 'src', 'data', 'b2bAnalystPosts.ts');
 const TEMPLATE_PATH = resolve(DIST, 'index.html');
 const BASE_URL = 'https://xavi-003.github.io/blog';
+
+function parseB2BPosts(fileContent) {
+  const posts = [];
+  const blocks = fileContent.split(/id:\s*["']b2b-post-/);
+  for (let i = 1; i < blocks.length; i++) {
+    const b = blocks[i];
+    const slug = (b.match(/slug:\s*["']([^"']+)["']/) || [])[1];
+    const title = (b.match(/title:\s*["']([^"']+)["']/) || [])[1];
+    const subtitle = (b.match(/subtitle:\s*["']([^"']+)["']/) || [])[1];
+    const date = (b.match(/date:\s*["']([^"']+)["']/) || [])[1] || '2026-08-20';
+    const image = (b.match(/image:\s*["']([^"']+)["']/) || [])[1] || '';
+    const category = (b.match(/category:\s*["']([^"']+)["']/) || [])[1] || 'Enterprise AI';
+    if (slug && title) {
+      posts.push({ slug, title, subtitle: subtitle || '', date, image, category });
+    }
+  }
+  return posts;
+}
 
 /**
  * Strips markdown syntax and truncates text for use as a meta description.
  * Mirrors the `generateMetaDescription` function in useDocumentMeta.ts.
  */
 export function generateMetaDescription(content, maxLength = 160) {
+    if (!content) return 'Executive B2B technology intelligence report.';
     const stripped = content
         .replace(/#{1,6}\s+/g, '')
         .replace(/\*\*(.+?)\*\*/g, '$1')
@@ -50,6 +70,7 @@ export function generateMetaDescription(content, maxLength = 160) {
  * Escapes HTML special characters in a string for safe use in attribute values.
  */
 function escapeHtml(str) {
+    if (!str) return '';
     return str
         .replace(/&/g, '&amp;')
         .replace(/"/g, '&quot;')
@@ -61,14 +82,15 @@ function escapeHtml(str) {
  * Generates a complete HTML string from the template with post-specific meta tags.
  */
 export function buildPostHtml(template, post) {
-    const description = escapeHtml(generateMetaDescription(post.content));
+    const rawDesc = post.subtitle || generateMetaDescription(post.content);
+    const description = escapeHtml(rawDesc);
     const title = escapeHtml(post.title);
     const fullTitle = escapeHtml(`${post.title} | AI Insights Pro`);
-    const keywords = escapeHtml(`${post.category}, AI, Technology, ${post.source}`);
-    const author = escapeHtml(`AI Insights Pro — via ${post.source}`);
+    const keywords = escapeHtml(`${post.category || 'Tech'}, AI, Technology, B2B Intelligence, ${post.source || 'AI Insights Pro'}`);
+    const author = escapeHtml(post.author?.name || 'Antony Xavier — Lead Tech & Systems Analyst');
     const image = post.image || '';
     const postUrl = `${BASE_URL}/blog/${post.slug}`;
-    const publishedTime = new Date(post.date).toISOString();
+    const publishedTime = new Date(post.date || Date.now()).toISOString();
     const twitterCard = post.image ? 'summary_large_image' : 'summary';
 
     let html = template;
@@ -150,7 +172,7 @@ export function buildPostHtml(template, post) {
     // Add twitter:image (insert after twitter:description)
     if (image) {
         html = html.replace(
-            /(<meta\s+name="twitter:description"\s+content=".*?"\s*\/>)/,
+            /(<meta\s+name="twitter:description"\s+content=".*?"\s*\/?>)/,
             `$1\n  <meta name="twitter:image" content="${escapeHtml(image)}" />`
         );
     }
@@ -171,7 +193,7 @@ export function buildPostHtml(template, post) {
 }
 
 /**
- * Main entry point — reads posts.json, the dist template, and writes per-slug HTML.
+ * Main entry point — reads posts.json and b2bAnalystPosts, the dist template, and writes per-slug HTML.
  */
 function main() {
     if (!existsSync(TEMPLATE_PATH)) {
@@ -179,12 +201,40 @@ function main() {
         process.exit(1);
     }
 
-    const posts = JSON.parse(readFileSync(POSTS_PATH, 'utf-8'));
     const template = readFileSync(TEMPLATE_PATH, 'utf-8');
+    const seenSlugs = new Set();
+    const allPosts = [];
+
+    // 1. Read b2bAnalystPosts
+    if (existsSync(B2B_POSTS_PATH)) {
+        try {
+            const content = readFileSync(B2B_POSTS_PATH, 'utf-8');
+            const b2bPosts = parseB2BPosts(content);
+            for (const post of b2bPosts) {
+                if (!seenSlugs.has(post.slug)) {
+                    seenSlugs.add(post.slug);
+                    allPosts.push(post);
+                }
+            }
+        } catch (e) {
+            console.warn('Could not parse b2bAnalystPosts in prerender-meta:', e);
+        }
+    }
+
+    // 2. Read posts.json
+    if (existsSync(POSTS_PATH)) {
+        const posts = JSON.parse(readFileSync(POSTS_PATH, 'utf-8'));
+        for (const post of posts) {
+            if (!seenSlugs.has(post.slug)) {
+                seenSlugs.add(post.slug);
+                allPosts.push(post);
+            }
+        }
+    }
 
     let count = 0;
 
-    for (const post of posts) {
+    for (const post of allPosts) {
         const slugDir = resolve(DIST, 'blog', post.slug);
         const outputPath = resolve(slugDir, 'index.html');
 

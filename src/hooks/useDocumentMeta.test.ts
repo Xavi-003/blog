@@ -107,20 +107,20 @@ describe('useDocumentMeta — Homepage Defaults (DEFAULT_META)', () => {
 
     it('should set correct document title for homepage', () => {
         renderHook(() => useDocumentMeta(DEFAULT_META));
-        expect(document.title).toBe('AI Insights Pro | Future of Tech');
+        expect(document.title).toBe('AI Insights Pro | B2B Tech Intelligence & Enterprise AI Analysis');
     });
 
     it('should set correct meta description for homepage', () => {
         renderHook(() => useDocumentMeta(DEFAULT_META));
         expect(getMetaContent('name', 'description')).toBe(
-            'Automated daily tech insights and analysis powered by Google Gemini AI.'
+            'Executive-grade tech intelligence, enterprise AI integration costs, crypto exchange architecture, and data governance analysis for B2B decision-makers.'
         );
     });
 
     it('should set correct meta keywords for homepage', () => {
         renderHook(() => useDocumentMeta(DEFAULT_META));
         expect(getMetaContent('name', 'keywords')).toBe(
-            'AI, Technology, News, Automation, Future Tech, Gemini AI'
+            'Enterprise AI, B2B Tech, Crypto Exchange Architecture, AI Governance, Technology ROI, CTO Insights, Decision Maker Briefing'
         );
     });
 
@@ -131,36 +131,36 @@ describe('useDocumentMeta — Homepage Defaults (DEFAULT_META)', () => {
 
     it('should set og:title for homepage', () => {
         renderHook(() => useDocumentMeta(DEFAULT_META));
-        expect(getMetaContent('property', 'og:title')).toBe('AI Insights Pro');
+        expect(getMetaContent('property', 'og:title')).toBe('AI Insights Pro | Enterprise Tech Intelligence');
     });
 
     it('should set og:description for homepage', () => {
         renderHook(() => useDocumentMeta(DEFAULT_META));
         expect(getMetaContent('property', 'og:description')).toBe(
-            'Automated daily tech insights and analysis powered by Google Gemini AI.'
+            'Automated daily tech insights and executive analysis for investors, founders, and CTOs.'
         );
     });
 
-    it('should set twitter:card to "summary" for homepage', () => {
+    it('should set twitter:card to "summary_large_image" for homepage', () => {
         renderHook(() => useDocumentMeta(DEFAULT_META));
-        expect(getMetaContent('name', 'twitter:card')).toBe('summary');
+        expect(getMetaContent('name', 'twitter:card')).toBe('summary_large_image');
     });
 
     it('should set twitter:title for homepage', () => {
         renderHook(() => useDocumentMeta(DEFAULT_META));
-        expect(getMetaContent('name', 'twitter:title')).toBe('AI Insights Pro');
+        expect(getMetaContent('name', 'twitter:title')).toBe('AI Insights Pro | Enterprise Tech Intelligence');
     });
 
     it('should set twitter:description for homepage', () => {
         renderHook(() => useDocumentMeta(DEFAULT_META));
         expect(getMetaContent('name', 'twitter:description')).toBe(
-            'Automated daily tech insights and analysis powered by Google Gemini AI.'
+            'Automated daily tech insights and executive analysis for investors, founders, and CTOs.'
         );
     });
 
     it('should set author meta tag for homepage', () => {
         renderHook(() => useDocumentMeta(DEFAULT_META));
-        expect(getMetaContent('name', 'author')).toBe('AI Insights Pro');
+        expect(getMetaContent('name', 'author')).toBe('AI Insights Pro Analyst Bureau');
     });
 });
 
@@ -291,7 +291,7 @@ describe('useDocumentMeta — Cleanup/Restore on Unmount', () => {
         expect(document.title).toBe('Some Post | AI Insights Pro');
 
         unmount();
-        expect(document.title).toBe('AI Insights Pro | Future of Tech');
+        expect(document.title).toBe('AI Insights Pro | B2B Tech Intelligence & Enterprise AI Analysis');
     });
 
     it('should restore homepage meta description when unmounted', () => {
@@ -305,7 +305,7 @@ describe('useDocumentMeta — Cleanup/Restore on Unmount', () => {
 
         unmount();
         expect(getMetaContent('name', 'description')).toBe(
-            'Automated daily tech insights and analysis powered by Google Gemini AI.'
+            'Executive-grade tech intelligence, enterprise AI integration costs, crypto exchange architecture, and data governance analysis for B2B decision-makers.'
         );
     });
 
@@ -323,18 +323,18 @@ describe('useDocumentMeta — Cleanup/Restore on Unmount', () => {
         expect(getMetaContent('property', 'og:type')).toBe('website');
     });
 
-    it('should restore twitter:card to "summary" when unmounted', () => {
+    it('should restore twitter:card to "summary_large_image" when unmounted', () => {
         const postMeta: DocumentMeta = {
             title: 'Test',
             description: 'Test desc',
-            twitterCard: 'summary_large_image',
+            twitterCard: 'summary',
         };
 
         const { unmount } = renderHook(() => useDocumentMeta(postMeta));
-        expect(getMetaContent('name', 'twitter:card')).toBe('summary_large_image');
+        expect(getMetaContent('name', 'twitter:card')).toBe('summary');
 
         unmount();
-        expect(getMetaContent('name', 'twitter:card')).toBe('summary');
+        expect(getMetaContent('name', 'twitter:card')).toBe('summary_large_image');
     });
 
     it('should restore og:title to homepage default when unmounted', () => {
@@ -348,7 +348,7 @@ describe('useDocumentMeta — Cleanup/Restore on Unmount', () => {
         expect(getMetaContent('property', 'og:title')).toBe('My Custom OG Title');
 
         unmount();
-        expect(getMetaContent('property', 'og:title')).toBe('AI Insights Pro');
+        expect(getMetaContent('property', 'og:title')).toBe('AI Insights Pro | Enterprise Tech Intelligence');
     });
 });
 

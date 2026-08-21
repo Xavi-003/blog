@@ -1,0 +1,6 @@
+{
+  "name": "AI Insights Pro",
+  "description": "Executive B2B tech intelligence platform with decision matrices, ROI calculators, interactive roadmaps, and Answer Engine Optimization (AEO).",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

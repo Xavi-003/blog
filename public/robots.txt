@@ -2,3 +2,6 @@ User-agent: *
 Allow: /
 
 Sitemap: https://xavi-003.github.io/blog/sitemap.xml
+# LLMs and AI discovery
+# https://xavi-003.github.io/blog/llms.txt
+# https://xavi-003.github.io/blog/llms-full.txt

@@ -1,318 +1,326 @@
+#!/usr/bin/env python3
+"""
+generate_post.py — Automated Executive Tech Intelligence Generator
+
+Fetches the latest technology breakthroughs and enterprise announcements from
+verified RSS feeds, then synthesizes in-depth B2B intelligence briefings using
+the Google Gemini API.
+
+Security Best Practices:
+- Accesses GEMINI_API_KEY strictly from environment variables (GitHub Secrets / local .env).
+- Sanitizes all exceptions to prevent accidental API key leakage in logs.
+- Never prints, logs, or transmits secrets.
+- Exits cleanly with non-leaking diagnostics if credentials are missing.
+"""
+
 import os
-import time
+import sys
+import json
+import uuid
+import re
+import random
+from datetime import datetime, timezone
 import requests
 import feedparser
-import google.generativeai as genai
-from datetime import datetime
-import random
-import json
-import re
-import concurrent.futures
-import uuid
-import logging
 from bs4 import BeautifulSoup
 
-# Configuration
+# Try importing google.generativeai
+try:
+    import google.generativeai as genai
+    HAS_GENAI = True
+except ImportError:
+    HAS_GENAI = False
+
+# Verified RSS Feed Sources
 RSS_FEEDS = [
-    "https://techcrunch.com/feed/",
-    "https://www.theverge.com/rss/index.xml",
-    "https://www.wired.com/feed/rss",
-    "https://9to5mac.com/feed/",
-    "https://gizmodo.com/feed",
-    "https://engadget.com/rss.xml",
-    "https://arstechnica.com/feed/",
-    "https://www.theatlantic.com/feed/channel/technology/",
-    "https://www.zdnet.com/news/rss.xml"
+    {"source": "techcrunch.com", "url": "https://techcrunch.com/feed/"},
+    {"source": "theverge.com", "url": "https://www.theverge.com/rss/index.xml"},
+    {"source": "wired.com", "url": "https://www.wired.com/feed/rss"},
+    {"source": "arstechnica.com", "url": "https://feeds.arstechnica.com/arstechnica/index"},
+    {"source": "venturebeat.com", "url": "https://venturebeat.com/feed/"},
+    {"source": "9to5mac.com", "url": "https://9to5mac.com/feed/"},
 ]
 
-CATEGORY_COLORS = ["#a855f7", "#22d3ee", "#10b981", "#f59e0b", "#ef4444", "#6366f1"]
-CATEGORIES = ["AI", "Future", "Mobile", "Hardware", "Security", "Computing", "Space", "Robotics"]
-STYLES = ["Deep Dive", "News Flash", "Tech Opinion", "Briefing"]
-FORMATS = ["Long Form", "Quick Summary", "Bullet Points"]
+# Curated High-Resolution Unsplash Tech Banners
+TECH_IMAGE_PALETTE = [
+    "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=1200&h=630",
+    "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=1200&h=630",
+    "https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&q=80&w=1200&h=630",
+    "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&q=80&w=1200&h=630",
+    "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=1200&h=630",
+    "https://images.unsplash.com/photo-1504639725590-34d0984388bd?auto=format&fit=crop&q=80&w=1200&h=630",
+    "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=1200&h=630",
+]
 
-# Configure Logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
+CATEGORY_COLORS = {
+    "AI & Machine Learning": "#2563eb",
+    "Cybersecurity": "#ef4444",
+    "Cloud Infrastructure": "#0284c7",
+    "Robotics": "#10b981",
+    "Quantum & DeepTech": "#8b5cf6",
+    "Hardware & Mobile": "#f59e0b",
+    "Enterprise Software": "#4f46e5",
+}
 
-# Configure Gemini
-api_key = os.getenv("GEMINI_API_KEY")
-if api_key:
-    genai.configure(api_key=api_key)
-else:
-    logger.warning("GEMINI_API_KEY not found in environment. Content generation will be limited.")
-
-def sanitize_text(text):
-    """Sanitize text by removing HTML tags and excessive whitespace."""
-    if not text:
+def clean_html(raw_html: str) -> str:
+    """Extract clean text content from HTML snippets."""
+    if not raw_html:
         return ""
-    try:
-        soup = BeautifulSoup(text, "html.parser")
-        text = soup.get_text(separator=" ")
-        return " ".join(text.split())
-    except Exception as e:
-        logger.error(f"Error sanitizing text: {e}")
-        return text
+    soup = BeautifulSoup(raw_html, "html.parser")
+    return soup.get_text(separator=" ", strip=True)
 
-def fetch_feed(feed_url):
-    """Fetch and parse a single RSS feed."""
-    try:
-        feed = feedparser.parse(feed_url)
-        feed_articles = []
-        for entry in feed.entries[:5]:
-            image_url = None
-            if 'media_content' in entry and entry.media_content:
-                image_url = entry.media_content[0].get('url')
-            if not image_url and 'media_thumbnail' in entry and entry.media_thumbnail:
-                image_url = entry.media_thumbnail[0].get('url')
-            if not image_url and 'links' in entry:
-                for link in entry.links:
-                    if link.get('type', '').startswith('image/'):
-                        image_url = link.get('href')
-                        break
-            
-            summary = getattr(entry, "summary", "")
-            if not summary and "content" in entry:
-                summary = entry.content[0].value
+def slugify(text: str) -> str:
+    """Generate SEO-friendly URL slug."""
+    text = text.lower()
+    text = re.sub(r'[^a-z0-9\s-]', '', text)
+    text = re.sub(r'[\s-]+', '-', text)
+    return text.strip('-')[:100]
 
-            feed_articles.append({
-                "title": sanitize_text(entry.title),
-                "link": entry.link,
-                "summary": sanitize_text(summary),
-                "source": feed_url.split('/')[2].replace('www.', ''),
-                "image_url": image_url
-            })
-        return feed_articles
+def sanitize_error(err: Exception, key: str) -> str:
+    """Sanitize error messages to ensure API keys are never leaked to logs."""
+    msg = str(err)
+    if key and key in msg:
+        msg = msg.replace(key, "[REDACTED_API_KEY]")
+    return msg
+
+def get_existing_posts(posts_file: str) -> list:
+    """Load existing posts from posts.json."""
+    if not os.path.exists(posts_file):
+        return []
+    try:
+        with open(posts_file, 'r', encoding='utf-8') as f:
+            return json.load(f)
     except Exception as e:
-        logger.error(f"Error fetching {feed_url}: {e}")
+        print(f"⚠️ Warning: Could not parse existing posts: {e}")
         return []
 
-def fetch_latest_news():
-    """Fetch news from all feeds concurrently."""
-    articles = []
-    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
-        future_to_url = {executor.submit(fetch_feed, url): url for url in RSS_FEEDS}
-        for future in concurrent.futures.as_completed(future_to_url):
-            url = future_to_url[future]
-            try:
-                data = future.result()
-                articles.extend(data)
-            except Exception as e:
-                logger.error(f"Feed processing error for {url}: {e}")
-    return articles
+def fetch_latest_news(existing_links: set, existing_titles: set) -> dict | None:
+    """Fetch fresh news articles across all feeds and return the best candidate."""
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 AI-Insights-Pro-Bot/1.0"
+    }
 
-def get_available_models():
-    """Discover available Gemini models, sorted cheapest first."""
-    preferred_order = [
-        'gemini-2.0-flash-lite',
-        'gemini-2.0-flash',
-        'gemini-1.5-flash-latest',
-    ]
-    try:
-        available = []
-        for m in genai.list_models():
-            # supported_generation_methods is a list of strings like ['generateContent']
-            methods = m.supported_generation_methods
-            if 'generateContent' in methods:
-                name = m.name.replace('models/', '')
-                available.append(name)
-        
-        # Sort by our preferred order (cheapest first)
-        sorted_models = [m for m in preferred_order if m in available]
-        for m in available:
-            if 'flash' in m and m not in sorted_models:
-                sorted_models.append(m)
-        
-        result = sorted_models[:4] if sorted_models else preferred_order[:2]
-        logger.info(f"Available models: {result}")
-        return result
-    except Exception as e:
-        logger.warning(f"Could not list models: {e}. Using defaults.")
-        return preferred_order[:2]
+    candidates = []
 
-# Global flag — when True, skip all API calls for this run
-_rate_limited = False
-
-def generate_content(article=None, models=None):
-    global _rate_limited
-    
-    if _rate_limited:
-        logger.info("⏸ Skipping — API quota exhausted for this run.")
-        return None, None
-    
-    if not os.getenv("GEMINI_API_KEY"):
-        logger.error("Skipping: No API Key")
-        return None, None
-    
-    if models is None:
-        models = get_available_models()
-    
-    if article:
-        prompt = f"""
-        Write a comprehensive technical blog post about: {article['title']}.
-        Context: {article['summary']}
-        Link: {article['link']}
-
-        STRICT GUIDELINES:
-        1. Focus on technical specifications and industry impact.
-        2. Write 600-800 words.
-        3. Use Markdown: # Title, ## Executive Summary, ## Technical Deep Dive, ## Impact, ## Why it Matters.
-        4. End with: "--- SOURCE: Adapted from {article['source']}"
-        5. Use bold text and bullet points.
-        """
-    else:
-        prompt = """
-        Act as a visionary tech journalist.
-        Select a specific, cutting-edge, niche topic related to AI, Quantum Computing, Space, Biotechnology, or Cybernetics. 
-        Choose a topic that is highly specific (e.g., instead of "AI in 2026", use "Liquid Neural Networks replacing Transformers").
-        
-        Generate a breaking news style technical blog post about it.
-        
-        STRICT GUIDELINES:
-        1. Write a 700-word visionary analysis.
-        2. START with a valid Markdown Title like: # [Your Unique Title Here]
-        3. Use Markdown structure: ## The Breakthrough, ## How It Works, ## Industry Impact, ## Future Outlook.
-        4. End with: "--- SOURCE: AI Intelligence Synthesis"
-        5. Tone: Professional, Excited, Technical.
-        6. DO NOT repeat common topics. Be creative and unique.
-        """
-
-    for model_name in models:
+    for feed_info in RSS_FEEDS:
         try:
-            logger.info(f"Using model: {model_name}...")
-            model = genai.GenerativeModel(f"models/{model_name}")
-            response = model.generate_content(prompt)
-            logger.info(f"✅ Generated with {model_name}")
-            return response.text, (article['source'] if article else "AI Synthesis")
+            resp = requests.get(feed_info["url"], headers=headers, timeout=10)
+            if resp.status_code != 200:
+                continue
+            feed = feedparser.parse(resp.content)
+            for entry in feed.entries[:10]:
+                link = getattr(entry, "link", "").strip()
+                title = clean_html(getattr(entry, "title", "")).strip()
+                summary = clean_html(getattr(entry, "summary", "") or getattr(entry, "description", "")).strip()
 
+                if not title or not link:
+                    continue
+                
+                # Check for duplicates
+                norm_title = title.lower()
+                if link in existing_links or norm_title in existing_titles:
+                    continue
+
+                candidates.append({
+                    "title": title,
+                    "link": link,
+                    "summary": summary,
+                    "source": feed_info["source"],
+                    "published": getattr(entry, "published", "")
+                })
         except Exception as e:
-            error_msg = str(e)
-            if "429" in error_msg or "quota" in error_msg.lower():
-                logger.warning(f"Rate limited on {model_name}.")
-            else:
-                logger.warning(f"{model_name} failed: {e}")
-            continue
-    
-    # All models failed — mark as rate limited so we stop trying
-    logger.warning("⛔ All models exhausted. Stopping for this run.")
-    _rate_limited = True
-    return None, None
+            print(f"⚠️ Could not fetch feed {feed_info['source']}: {e}")
 
-def save_post(title, content, original_link, source, image_url=None):
-    data_dir = "src/data"
-    os.makedirs(data_dir, exist_ok=True)
-    posts_file = os.path.join(data_dir, "posts.json")
-    posts = []
+    if not candidates:
+        return None
+
+    # Pick the top candidate
+    return candidates[0]
+
+def generate_b2b_intelligence(news_item: dict, api_key: str) -> dict | None:
+    """Synthesize executive tech intelligence report using Gemini API."""
+    if not HAS_GENAI:
+        print("❌ google-generativeai package is not installed.")
+        return None
+
+    genai.configure(api_key=api_key)
+
+    # Preferred modern models with fallback
+    models_to_try = ['gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-1.5-pro']
     
-    if os.path.exists(posts_file):
+    prompt = f"""You are the Lead Technology & Systems Architect at AI Insights Pro.
+Analyze the following tech news development and produce a comprehensive, executive-grade B2B intelligence report for CTOs, CFOs, Enterprise Architects, and Tech Leaders.
+
+News Item Details:
+- Title: {news_item['title']}
+- Source: {news_item['source']}
+- Original Link: {news_item['link']}
+- Raw Summary/Context: {news_item['summary']}
+
+Please return ONLY a valid JSON object matching this exact JSON schema (without any markdown code block fences if possible, or inside a clean ```json block):
+{{
+  "title": "Clear, compelling executive headline (max 90 chars)",
+  "subtitle": "Informative subtitle capturing the strategic business impact",
+  "category": "One of: AI & Machine Learning, Cybersecurity, Cloud Infrastructure, Robotics, Quantum & DeepTech, Hardware & Mobile, Enterprise Software",
+  "targetRole": ["CTO", "CFO", "Founders", "Security", "Operations"],
+  "threatLevel": "One of: High, Medium, Opportunity",
+  "reading_time": "7 min",
+  "executiveTakeaways": [
+    {{
+      "tag": "STRATEGY",
+      "label": "Strategic Vector",
+      "text": "1-2 sentences on direct organizational strategy implications."
+    }},
+    {{
+      "tag": "IMPACT",
+      "label": "Market & Cost Impact",
+      "text": "1-2 sentences on cost, infrastructure, or operational risk."
+    }},
+    {{
+      "tag": "ACTION",
+      "label": "Recommended Roadmap",
+      "text": "1-2 sentences on immediate actions engineering leadership should take."
+    }}
+  ],
+  "content": "Full markdown text with sections: ## Executive Summary, ## Technical Deep Dive (with bullet points and architectural details), ## Impact (for enterprises, engineers, and financial bottom line), ## Why it Matters (strategic industry conclusion), and ending with a formal attribution link to the source."
+}}
+"""
+
+    response_text = None
+    for model_name in models_to_try:
         try:
-            with open(posts_file, "r") as f:
-                posts = json.load(f)
-        except json.JSONDecodeError:
-            logger.warning("posts.json is corrupted or empty. Starting fresh.")
-            posts = []
+            model = genai.GenerativeModel(model_name)
+            response = model.generate_content(
+                prompt,
+                generation_config=genai.types.GenerationConfig(
+                    temperature=0.2,
+                    max_output_tokens=3000
+                )
+            )
+            if response and response.text:
+                response_text = response.text.strip()
+                print(f"✅ Successfully synthesized briefing using {model_name}.")
+                break
+        except Exception as e:
+            sanitized = sanitize_error(e, api_key)
+            print(f"⚠️ Model {model_name} failed: {sanitized}")
 
-    # Clean title and extract from content if needed
-    generated_title = title
-    lines = content.strip().split('\n')
-    for i, line in enumerate(lines[:5]):
-        if line.startswith("# "):
-            generated_title = line.replace("# ", "").strip()
-            content = "\n".join(lines[i+1:]).strip()
-            break
+    if not response_text:
+        return None
 
-    slug = re.sub(r'[^a-z0-9]+', '-', generated_title.lower()).strip('-')
-    
-    # Check for duplicate slug
-    if any(p.get('slug') == slug for p in posts):
-        logger.info(f"Skipping duplicate post: {slug}")
-        return False
+    # Parse JSON from response
+    try:
+        # Strip markdown fences if present
+        cleaned_json = response_text
+        if "```json" in cleaned_json:
+            cleaned_json = cleaned_json.split("```json")[1].split("```")[0].strip()
+        elif "```" in cleaned_json:
+            cleaned_json = cleaned_json.split("```")[1].split("```")[0].strip()
 
-    category = random.choice(CATEGORIES)
-    if not image_url:
-        seed = random.randint(1, 1000)
-        image_url = f"https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=1200&h=630&sig={seed}"
+        data = json.loads(cleaned_json)
+        return data
+    except Exception as e:
+        print(f"⚠️ Failed to parse JSON response: {e}")
+        # Fallback structured object
+        return {
+            "title": news_item['title'],
+            "subtitle": f"Strategic intelligence analysis from {news_item['source']}",
+            "category": "Enterprise Software",
+            "targetRole": ["CTO", "Founders"],
+            "threatLevel": "Opportunity",
+            "reading_time": "6 min",
+            "executiveTakeaways": [
+                {
+                    "tag": "STRATEGY",
+                    "label": "Executive Briefing",
+                    "text": news_item['summary'][:150] + "..."
+                },
+                {
+                    "tag": "IMPACT",
+                    "label": "Industry Dynamics",
+                    "text": "Accelerates technological shifts across enterprise deployments and infrastructure paradigms."
+                },
+                {
+                    "tag": "ACTION",
+                    "label": "Recommended Stance",
+                    "text": "Review internal dependencies and evaluate potential architectural alignments."
+                }
+            ],
+            "content": f"## Executive Summary\n\n{news_item['summary']}\n\n## Technical Deep Dive\n\nThis development from **{news_item['source']}** highlights key shifts in modern technical architectures and industry execution.\n\n## Impact\n\nProvides measurable improvements in system resilience, operational capabilities, and technological velocity.\n\n## Why it Matters\n\nStaying ahead of these industry trends is essential for maintainable long-term technical leadership.\n\n---\nSOURCE: Adapted from [{news_item['source']}]({news_item['link']})"
+        }
+
+def main():
+    print("🚀 AI Insights Pro — Automated Content Synthesis Engine")
+
+    # Retrieve and validate GEMINI_API_KEY
+    api_key = os.environ.get("GEMINI_API_KEY", "").strip()
+    if not api_key:
+        print("❌ SECURITY ERROR: GEMINI_API_KEY environment variable is not configured.")
+        print("ℹ️ For GitHub Actions: Add GEMINI_API_KEY in Repository Settings -> Secrets and variables -> Actions.")
+        print("ℹ️ For local development: Set GEMINI_API_KEY in your .env file.")
+        sys.exit(0) # Clean non-fatal exit to prevent breaking CI pipeline on missing secret
+
+    posts_file = os.path.join(os.path.dirname(__file__), "src", "data", "posts.json")
+    existing_posts = get_existing_posts(posts_file)
+    print(f"📚 Loaded {len(existing_posts)} existing intelligence briefings.")
+
+    existing_links = {p.get("original_link", "").strip() for p in existing_posts if p.get("original_link")}
+    existing_titles = {p.get("title", "").strip().lower() for p in existing_posts if p.get("title")}
+
+    # Step 1: Fetch fresh tech news candidate
+    print("📡 Querying RSS feeds for new industry developments...")
+    candidate = fetch_latest_news(existing_links, existing_titles)
+    if not candidate:
+        print("✨ No new unanalyzed articles found across configured RSS feeds.")
+        return
+
+    print(f"🎯 Selected article for analysis: '{candidate['title']}' ({candidate['source']})")
+
+    # Step 2: Generate B2B intelligence report
+    print("🧠 Generating executive analysis via Gemini AI...")
+    report = generate_b2b_intelligence(candidate, api_key)
+    if not report:
+        print("❌ Failed to synthesize intelligence report.")
+        return
+
+    # Step 3: Assemble final post schema
+    now_iso = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+    title = report.get("title", candidate["title"])
+    category = report.get("category", "AI & Machine Learning")
+    color = CATEGORY_COLORS.get(category, "#2563eb")
+    image = random.choice(TECH_IMAGE_PALETTE)
 
     new_post = {
         "id": str(uuid.uuid4()),
-        "title": generated_title,
-        "slug": slug,
-        "content": content,
-        "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        "original_link": original_link,
-        "image": image_url,
+        "title": title,
+        "subtitle": report.get("subtitle"),
+        "slug": slugify(title),
+        "content": report.get("content", candidate["summary"]),
+        "date": now_iso,
+        "original_link": candidate["link"],
+        "image": f"{image}&sig={random.randint(100, 999)}",
         "category": category,
-        "style": random.choice(STYLES),
-        "format": random.choice(FORMATS),
-        "color": random.choice(CATEGORY_COLORS),
-        "source": source,
-        "reading_time": f"{random.randint(5, 10)} min"
+        "style": "Deep Dive",
+        "format": "Executive Report",
+        "color": color,
+        "source": candidate["source"],
+        "reading_time": report.get("reading_time", "6 min"),
+        "targetRole": report.get("targetRole", ["CTO", "CFO"]),
+        "threatLevel": report.get("threatLevel", "Opportunity"),
+        "executiveTakeaways": report.get("executiveTakeaways", [])
     }
-    
-    posts.insert(0, new_post)
-    
-    # Keep only latest 100 posts
-    if len(posts) > 100:
-        posts = posts[:100]
 
-    with open(posts_file, "w") as f:
-        json.dump(posts, f, indent=2)
-    
-    logger.info(f"Saved new post: {generated_title}")
-    return True
+    # Prepend new post to the top of the collection
+    existing_posts.insert(0, new_post)
 
-def main():
-    logger.info("Starting AI Blog Generator...")
-    
-    # Discover models once
-    models = get_available_models()
-    
-    articles = fetch_latest_news()
-    logger.info(f"Fetched {len(articles)} articles from RSS feeds.")
-    
-    random.shuffle(articles)
-    
-    posts_file = "src/data/posts.json"
-    existing_slugs = []
-    if os.path.exists(posts_file):
-        try:
-            with open(posts_file, "r") as f:
-                existing_slugs = [p.get('slug') for p in json.load(f)]
-        except:
-            pass
-
-    # 1. Try to find a NEW news article
-    for article in articles:
-        slug = re.sub(r'[^a-z0-9]+', '-', article['title'].lower()).strip('-')
-        if slug not in existing_slugs:
-            logger.info(f"Processing: {article['title']}")
-            content, source = generate_content(article, models)
-            if content:
-                if save_post(article['title'], content, article['link'], source, article.get('image_url')):
-                    logger.info("✅ New post saved from news!")
-                    logger.info("Updating sitemap...")
-                    os.system("node scripts/generate-sitemap.mjs")
-                    return
-
-    # 2. Fallback: generate AI Insight
-    logger.info("No new news. Generating AI Insight...")
-    for attempt in range(3):
-        content, source = generate_content(None, models)
-        if content:
-            title = "AI Insight"
-            match = re.search(r'^# (.*)', content)
-            if match:
-                title = match.group(1)
-            if save_post(title, content, "https://github.com/Xavi-003/blog", source):
-                logger.info("✅ AI Insight post saved!")
-                logger.info("Updating sitemap...")
-                os.system("node scripts/generate-sitemap.mjs")
-                return
-            logger.warning(f"Duplicate, retry {attempt+1}/3...")
-
-    logger.info("No new post generated this run.")
+    # Step 4: Safely write back to posts.json
+    try:
+        with open(posts_file, "w", encoding="utf-8") as f:
+            json.dump(existing_posts, f, indent=2, ensure_ascii=False)
+        print(f"✅ Successfully created new intelligence report: '{title}'")
+        print(f"📊 Total posts now: {len(existing_posts)}")
+    except Exception as e:
+        print(f"❌ Failed to write posts.json: {e}")
 
 if __name__ == "__main__":
     main()

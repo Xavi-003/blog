@@ -28,6 +28,7 @@ import { ModernNavbar } from './components/ModernNavbar';
 import { ModernFooter } from './components/ModernFooter';
 import { AuthorProfileBadge } from './components/AuthorProfileBadge';
 import { LegalComplianceModal } from './components/LegalComplianceModal';
+import { DesktopReleaseModal } from './components/DesktopReleaseModal';
 
 const COLORS = [
   { name: 'Google Blue', value: '#4285f4' },
@@ -154,7 +155,7 @@ const HeroSection = ({ postCount }: { postCount: number }) => (
 );
 
 // --- HOME PAGE ---
-const Home = ({ onOpenSettings, onOpenLegalModal, theme, onThemeToggle, accent }: any) => {
+const Home = ({ onOpenSettings, onOpenLegalModal, onOpenDesktopModal, theme, onThemeToggle, accent }: any) => {
   const [posts] = useState<Post[]>(postsData);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -261,6 +262,7 @@ const Home = ({ onOpenSettings, onOpenLegalModal, theme, onThemeToggle, accent }
         onThemeToggle={onThemeToggle}
         onOpenSettings={onOpenSettings}
         onOpenLegalModal={onOpenLegalModal}
+        onOpenDesktopModal={onOpenDesktopModal}
         accent={accent}
       />
 
@@ -281,6 +283,17 @@ const Home = ({ onOpenSettings, onOpenLegalModal, theme, onThemeToggle, accent }
         </motion.div>
 
         <div className="search-connect-icons-far-right">
+          {onOpenDesktopModal && (
+            <button
+              type="button"
+              className="search-connect-desktop-btn"
+              onClick={onOpenDesktopModal}
+              title="Download Desktop App (Windows, Linux, macOS) Releases"
+            >
+              <Monitor size={18} />
+              <span className="desktop-tag">App</span>
+            </button>
+          )}
           <a href="https://github.com/Xavi-003" target="_blank" rel="noopener noreferrer" title="GitHub"><Github size={20} /></a>
           <a href="https://www.linkedin.com/in/antony-xavier-4b5019333" target="_blank" rel="noopener noreferrer" title="LinkedIn"><Linkedin size={20} /></a>
           <a href="https://xavi-003.github.io/portfolio/" target="_blank" rel="noopener noreferrer" title="Portfolio"><ExternalLink size={20} /></a>
@@ -426,13 +439,14 @@ const Home = ({ onOpenSettings, onOpenLegalModal, theme, onThemeToggle, accent }
       <ModernFooter 
         onOpenLegalModal={onOpenLegalModal} 
         onOpenSettings={onOpenSettings} 
+        onOpenDesktopModal={onOpenDesktopModal}
       />
     </motion.div>
   );
 };
 
 // --- EDITORIAL ARTICLE PAGE ---
-const EditorialPage = ({ accent, onOpenSettings, onOpenLegalModal, theme, onThemeToggle }: any) => {
+const EditorialPage = ({ accent, onOpenSettings, onOpenLegalModal, onOpenDesktopModal, theme, onThemeToggle }: any) => {
   const { slug } = useParams();
   const post = postsData.find(p => p.slug === slug);
   const [readingProgress, setReadingProgress] = useState(0);
@@ -697,6 +711,7 @@ const EditorialPage = ({ accent, onOpenSettings, onOpenLegalModal, theme, onThem
         onOpenSettings={onOpenSettings}
         onOpenLegalModal={onOpenLegalModal}
         onOpenDistribution={() => setIsDistributionOpen(true)}
+        onOpenDesktopModal={onOpenDesktopModal}
         accent={accent}
       />
 
@@ -850,6 +865,7 @@ const EditorialPage = ({ accent, onOpenSettings, onOpenLegalModal, theme, onThem
       <ModernFooter 
         onOpenLegalModal={onOpenLegalModal} 
         onOpenSettings={onOpenSettings} 
+        onOpenDesktopModal={onOpenDesktopModal}
       />
     </motion.div>
   );
@@ -893,6 +909,7 @@ function App() {
   const [accent, setAccent] = useState(localStorage.getItem('accent') || '#4285f4');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isLegalModalOpen, setIsLegalModalOpen] = useState(false);
+  const [isDesktopModalOpen, setIsDesktopModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const location = useLocation();
 
@@ -943,6 +960,11 @@ function App() {
         onClose={() => setIsLegalModalOpen(false)} 
       />
 
+      <DesktopReleaseModal
+        isOpen={isDesktopModalOpen}
+        onClose={() => setIsDesktopModalOpen(false)}
+      />
+
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
           <Route 
@@ -951,6 +973,7 @@ function App() {
               <Home 
                 onOpenSettings={() => setIsSettingsOpen(true)} 
                 onOpenLegalModal={() => setIsLegalModalOpen(true)}
+                onOpenDesktopModal={() => setIsDesktopModalOpen(true)}
                 theme={theme}
                 onThemeToggle={toggleTheme}
                 accent={accent} 
@@ -964,6 +987,7 @@ function App() {
                 accent={accent} 
                 onOpenSettings={() => setIsSettingsOpen(true)}
                 onOpenLegalModal={() => setIsLegalModalOpen(true)}
+                onOpenDesktopModal={() => setIsDesktopModalOpen(true)}
                 theme={theme}
                 onThemeToggle={toggleTheme}
               />

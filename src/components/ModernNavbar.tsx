@@ -15,7 +15,8 @@ import {
   Scale, 
   Menu, 
   Share2, 
-  ArrowLeft 
+  ArrowLeft,
+  Monitor
 } from 'lucide-react';
 import { AuthorProfileBadge } from './AuthorProfileBadge';
 
@@ -30,6 +31,7 @@ interface ModernNavbarProps {
   onOpenSettings?: () => void;
   onOpenLegalModal?: () => void;
   onOpenDistribution?: () => void;
+  onOpenDesktopModal?: () => void;
   accent?: string;
 }
 
@@ -43,7 +45,8 @@ export const ModernNavbar: React.FC<ModernNavbarProps> = ({
   onThemeToggle,
   onOpenSettings,
   onOpenLegalModal,
-  onOpenDistribution
+  onOpenDistribution,
+  onOpenDesktopModal
 }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
@@ -192,6 +195,21 @@ export const ModernNavbar: React.FC<ModernNavbarProps> = ({
           <div className="navbar-author-direct-wrap">
             <AuthorProfileBadge variant="navbar" />
           </div>
+
+          {/* Desktop App & GitHub Releases Trigger */}
+          {onOpenDesktopModal && (
+            <button
+              type="button"
+              className="navbar-desktop-btn"
+              onClick={onOpenDesktopModal}
+              title="Download Desktop App (Windows, Linux, macOS) — GitHub Releases"
+              aria-label="Desktop App Releases"
+            >
+              <Monitor size={14} />
+              <span className="desktop-btn-label">Desktop App</span>
+              <span className="desktop-release-dot" />
+            </button>
+          )}
 
           {/* Distribution Action (on editorial page) */}
           {isEditorial && onOpenDistribution && (
@@ -346,6 +364,18 @@ export const ModernNavbar: React.FC<ModernNavbarProps> = ({
                     </button>
                   </div>
                 </div>
+              )}
+
+              {/* Desktop App Download Button in Mobile */}
+              {onOpenDesktopModal && (
+                <button
+                  type="button"
+                  className="mobile-drawer-btn desktop-app-mobile-btn"
+                  onClick={() => { onOpenDesktopModal(); setMobileMenuOpen(false); }}
+                >
+                  <Monitor size={16} />
+                  <span>Download Desktop App (Win / Linux / Mac)</span>
+                </button>
               )}
 
               {/* Legal Governance Button in Mobile */}

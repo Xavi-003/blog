@@ -8,16 +8,22 @@ import {
   ShieldCheck, 
   Mail, 
   Sparkles,
-  Lock
+  Lock,
+  Monitor
 } from 'lucide-react';
 import { AuthorProfileBadge } from './AuthorProfileBadge';
 
 interface ModernFooterProps {
   onOpenLegalModal: () => void;
   onOpenSettings?: () => void;
+  onOpenDesktopModal?: () => void;
 }
 
-export const ModernFooter: React.FC<ModernFooterProps> = ({ onOpenLegalModal, onOpenSettings }) => {
+export const ModernFooter: React.FC<ModernFooterProps> = ({ 
+  onOpenLegalModal, 
+  onOpenSettings,
+  onOpenDesktopModal 
+}) => {
   const currentYear = new Date().getFullYear();
 
   return (
@@ -92,6 +98,14 @@ export const ModernFooter: React.FC<ModernFooterProps> = ({ onOpenLegalModal, on
                 <span>Engineering Advisory Disclaimer</span>
               </button>
             </li>
+            {onOpenDesktopModal && (
+              <li>
+                <button type="button" className="footer-link-btn desktop-footer-highlight" onClick={onOpenDesktopModal}>
+                  <Monitor size={14} />
+                  <span>Desktop App (Win / Linux / Mac)</span>
+                </button>
+              </li>
+            )}
             {onOpenSettings && (
               <li>
                 <button type="button" className="footer-link-btn" onClick={onOpenSettings}>
@@ -159,6 +173,18 @@ export const ModernFooter: React.FC<ModernFooterProps> = ({ onOpenLegalModal, on
             <ExternalLink size={14} />
             <span>Portfolio</span>
           </a>
+
+          {onOpenDesktopModal && (
+            <button
+              type="button"
+              className="footer-social-badge desktop-badge"
+              onClick={onOpenDesktopModal}
+              title="Download Desktop App Releases for Windows, Linux & Mac"
+            >
+              <Monitor size={14} />
+              <span>Desktop App</span>
+            </button>
+          )}
 
           <button
             type="button"

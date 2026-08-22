@@ -2,9 +2,45 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://xavi-003.github.io/blog/</loc>
-    <lastmod>2026-05-30</lastmod>
+    <lastmod>2026-08-22</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://xavi-003.github.io/blog/blog/enterprise-ai-integration-costs-roi-cfo-cto-decision-guide-2026</loc>
+    <lastmod>2026-08-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://xavi-003.github.io/blog/blog/white-label-crypto-exchange-software-architecture-security-benchmarks-2026</loc>
+    <lastmod>2026-08-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://xavi-003.github.io/blog/blog/ai-governance-data-sovereignty-mitigating-enterprise-legal-liabilities-2026</loc>
+    <lastmod>2026-08-18</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://xavi-003.github.io/blog/blog/autonomous-ai-agents-b2b-workflow-automation-case-studies-roadmap-2026</loc>
+    <lastmod>2026-08-17</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://xavi-003.github.io/blog/blog/fintech-cybersecurity-flash-loan-prevention-smart-contract-hardening-2026</loc>
+    <lastmod>2026-08-16</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://xavi-003.github.io/blog/blog/agentic-search-answer-engine-optimization-aeo-b2b-procurement-2026</loc>
+    <lastmod>2026-08-15</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
   </url>
   <url>
     <loc>https://xavi-003.github.io/blog/blog/stolen-device-protection-apple-bolsters-enterprise-security-by-default-in-ios-26-4-1</loc>

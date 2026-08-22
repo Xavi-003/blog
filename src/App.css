@@ -676,8 +676,8 @@ body {
 
 /* ========= EDITORIAL PAGE ========= */
 .editorial-page {
-  padding-top: 4rem;
-  padding-bottom: 6rem;
+  padding-top: 1rem;
+  padding-bottom: 2rem;
 }
 
 .reading-progress-container {
@@ -1101,7 +1101,7 @@ body {
   }
 
   .editorial-page {
-    padding-top: 3rem;
+    padding-top: 1rem;
   }
 
   .editorial-header-redesign {
@@ -4634,7 +4634,7 @@ body {
 .modern-footer-container {
   width: 100%;
   max-width: 1280px;
-  margin: 4rem auto 1.5rem auto;
+  margin: 1rem auto 1rem auto;
   padding: 2.5rem 1.5rem 1.5rem 1.5rem;
   background: var(--bg-card);
   border: 1px solid var(--border-color);

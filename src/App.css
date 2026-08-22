@@ -676,7 +676,7 @@ body {
 
 /* ========= EDITORIAL PAGE ========= */
 .editorial-page {
-  padding-top: 1rem;
+  padding-top: 0;
   padding-bottom: 2rem;
 }
 
@@ -1335,7 +1335,7 @@ body {
   }
 
   .editorial-page {
-    padding-top: 1rem;
+    padding-top: 0;
   }
 
   .editorial-header-redesign {
@@ -4206,6 +4206,18 @@ body {
   transform: scale(1.15);
 }
 
+@media (max-width: 1250px) {
+  .navbar-editorial-center-tag,
+  .desktop-btn-label,
+  .repurpose-text {
+    display: none !important;
+  }
+  .navbar-desktop-btn,
+  .navbar-repurpose-btn {
+    padding: 0.35rem 0.6rem;
+  }
+}
+
 @media (max-width: 1100px) {
   .navbar-author-cta {
     display: none;
@@ -4213,7 +4225,11 @@ body {
 }
 
 @media (max-width: 900px) {
-  .navbar-author-direct-wrap {
+  .navbar-author-direct-wrap,
+  .navbar-desktop-btn,
+  .navbar-repurpose-btn,
+  .navbar-icon-btn.legal-btn,
+  .navbar-icon-btn.settings-btn {
     display: none;
   }
   .navbar-center-area {

@@ -129,7 +129,7 @@ export const ModernNavbar: React.FC<ModernNavbarProps> = ({
 
         {/* Center: Search & Navigation */}
         <div className="navbar-center-area">
-          {!isEditorial && onSearchChange && (
+          {onSearchChange && (
             <div className={`navbar-search-pill ${isSearchFocused ? 'focused' : ''}`}>
               <Search size={15} className="navbar-search-icon" />
               <input
@@ -158,7 +158,7 @@ export const ModernNavbar: React.FC<ModernNavbarProps> = ({
           )}
 
           {/* Quick View Mode Switcher (on Home) */}
-          {!isEditorial && onViewModeChange && (
+          {onViewModeChange && (
             <div className="navbar-mode-switch">
               <button
                 type="button"
@@ -318,7 +318,7 @@ export const ModernNavbar: React.FC<ModernNavbarProps> = ({
               <div className="mobile-drawer-divider" />
 
               {/* Mobile Search Bar (on Home Page) */}
-              {!isEditorial && onSearchChange && (
+              {onSearchChange && (
                 <div className="mobile-search-wrapper">
                   <div className="mobile-search-pill">
                     <Search size={15} className="navbar-search-icon" />
@@ -344,7 +344,7 @@ export const ModernNavbar: React.FC<ModernNavbarProps> = ({
               )}
 
               {/* View Switcher in Mobile */}
-              {!isEditorial && onViewModeChange && (
+              {onViewModeChange && (
                 <div className="mobile-drawer-row">
                   <span className="mobile-row-label">View Format:</span>
                   <div className="mobile-view-buttons">
@@ -375,6 +375,18 @@ export const ModernNavbar: React.FC<ModernNavbarProps> = ({
                 >
                   <Monitor size={16} />
                   <span>Download Desktop App (Win / Linux / Mac)</span>
+                </button>
+              )}
+
+              {/* Repurpose Kit Button in Mobile */}
+              {isEditorial && onOpenDistribution && (
+                <button
+                  type="button"
+                  className="mobile-drawer-btn"
+                  onClick={() => { onOpenDistribution(); setMobileMenuOpen(false); }}
+                >
+                  <Share2 size={16} />
+                  <span>Open C-Suite Repurposing Kit</span>
                 </button>
               )}
 

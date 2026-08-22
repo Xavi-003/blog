@@ -451,6 +451,7 @@ const EditorialPage = ({ accent, onOpenSettings, onOpenLegalModal, onOpenDesktop
   const post = postsData.find(p => p.slug === slug);
   const [readingProgress, setReadingProgress] = useState(0);
   const [isDistributionOpen, setIsDistributionOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const BASE_URL = 'https://xavi-003.github.io/blog';
 
@@ -706,6 +707,8 @@ const EditorialPage = ({ accent, onOpenSettings, onOpenLegalModal, onOpenDesktop
       {/* Modern Top Navigation Bar */}
       <ModernNavbar 
         isEditorial={true}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
         theme={theme}
         onThemeToggle={onThemeToggle}
         onOpenSettings={onOpenSettings}

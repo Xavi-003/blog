@@ -6,7 +6,7 @@ import {
   ArrowRight, ChevronDown, X, Calendar, LayoutGrid,
   ArrowLeft, Zap, ChevronUp, Settings, Sun, Moon, Clock, Globe,
   Github, Linkedin, ExternalLink, Sparkles, TrendingUp, BookOpen,
-  Share2, ShieldAlert, Table
+  Share2, ShieldAlert, Table, Monitor
 } from 'lucide-react';
 
 import './App.css';

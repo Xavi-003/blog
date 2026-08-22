@@ -9,7 +9,6 @@ import {
   CheckCircle2,
   Terminal,
   Layers,
-  Zap,
   ShieldCheck,
   HardDrive,
   Copy,
@@ -26,7 +25,6 @@ export const DesktopReleaseModal: React.FC<DesktopReleaseModalProps> = ({ isOpen
   const [copiedCmd, setCopiedCmd] = useState(false);
 
   const RELEASES_URL = 'https://github.com/Xavi-003/portfolio/releases';
-  const BLOG_RELEASES_URL = 'https://github.com/Xavi-003/blog/releases';
   const LATEST_VERSION = 'v2.4.0';
 
   const linuxInstallCommand = 'curl -sSL https://raw.githubusercontent.com/Xavi-003/portfolio/main/install-desktop.sh | bash';
@@ -37,7 +35,7 @@ export const DesktopReleaseModal: React.FC<DesktopReleaseModalProps> = ({ isOpen
     setTimeout(() => setCopiedCmd(false), 2000);
   };
 
-  const handleDownload = (platform: string, filename: string) => {
+  const handleDownload = () => {
     // Open GitHub releases with direct asset context
     window.open(`${RELEASES_URL}/latest`, '_blank', 'noopener,noreferrer');
   };
@@ -139,7 +137,7 @@ export const DesktopReleaseModal: React.FC<DesktopReleaseModalProps> = ({ isOpen
                     <button
                       type="button"
                       className="download-action-btn primary"
-                      onClick={() => handleDownload('windows', 'ai-insights-setup.exe')}
+                      onClick={() => handleDownload()}
                     >
                       <Download size={16} />
                       <div className="download-btn-text">
@@ -151,7 +149,7 @@ export const DesktopReleaseModal: React.FC<DesktopReleaseModalProps> = ({ isOpen
                     <button
                       type="button"
                       className="download-action-btn secondary"
-                      onClick={() => handleDownload('windows', 'ai-insights-portable.zip')}
+                      onClick={() => handleDownload()}
                     >
                       <HardDrive size={16} />
                       <div className="download-btn-text">
@@ -181,7 +179,7 @@ export const DesktopReleaseModal: React.FC<DesktopReleaseModalProps> = ({ isOpen
                     <button
                       type="button"
                       className="download-action-btn primary"
-                      onClick={() => handleDownload('linux', 'ai-insights-linux.AppImage')}
+                      onClick={() => handleDownload()}
                     >
                       <Download size={16} />
                       <div className="download-btn-text">
@@ -193,7 +191,7 @@ export const DesktopReleaseModal: React.FC<DesktopReleaseModalProps> = ({ isOpen
                     <button
                       type="button"
                       className="download-action-btn secondary"
-                      onClick={() => handleDownload('linux', 'ai-insights_amd64.deb')}
+                      onClick={() => handleDownload()}
                     >
                       <Layers size={16} />
                       <div className="download-btn-text">
@@ -242,7 +240,7 @@ export const DesktopReleaseModal: React.FC<DesktopReleaseModalProps> = ({ isOpen
                     <button
                       type="button"
                       className="download-action-btn primary"
-                      onClick={() => handleDownload('macos', 'ai-insights-arm64.dmg')}
+                      onClick={() => handleDownload()}
                     >
                       <Download size={16} />
                       <div className="download-btn-text">
@@ -254,7 +252,7 @@ export const DesktopReleaseModal: React.FC<DesktopReleaseModalProps> = ({ isOpen
                     <button
                       type="button"
                       className="download-action-btn secondary"
-                      onClick={() => handleDownload('macos', 'ai-insights-x64.dmg')}
+                      onClick={() => handleDownload()}
                     >
                       <HardDrive size={16} />
                       <div className="download-btn-text">

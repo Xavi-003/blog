@@ -146,7 +146,7 @@ def generate_b2b_intelligence(news_item: dict, api_key: str) -> dict | None:
     genai.configure(api_key=api_key)
 
     # Preferred modern models with fallback
-    models_to_try = ['gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-1.5-pro']
+    models_to_try = ['gemini-3.7-flash', 'gemini-3.6-flash', 'gemini-3.5-flash']
     
     prompt = f"""You are the Lead Technology & Systems Architect at AI Insights Pro.
 Analyze the following tech news development and produce a comprehensive, executive-grade B2B intelligence report for CTOs, CFOs, Enterprise Architects, and Tech Leaders.

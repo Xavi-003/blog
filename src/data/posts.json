@@ -1,5 +1,44 @@
 [
   {
+    "id": "28e8a96f-e73a-498f-8b64-11203144a8b6",
+    "title": "Bluesky Expands Media Architecture with 10-Minute Video Ingestion",
+    "subtitle": "Decentralized social protocol scales media pipeline to capture long-form enterprise content and developer mindshare",
+    "slug": "bluesky-expands-media-architecture-with-10-minute-video-ingestion",
+    "content": "## Executive Summary\n\nBluesky has rolled out support for native video uploads up to 10 minutes in duration, accompanied by an overhaul of its media ingestion pipeline to deliver significantly faster upload throughput. This enhancement shifts the platform from short-form, real-time micro-updates toward long-form, rich-media technical and organizational storytelling. For technology leaders and enterprise brand strategists, this milestone solidifies the commercial and developer viability of the underlying AT Protocol (Authenticated Transfer Protocol), positioning decentralized networks as scalable alternatives to legacy centralized broadcast platforms.\n\n## Technical Deep Dive\n\nSupporting 10-minute high-definition video within an open, federated protocol ecosystem requires addressing significant challenges across ingestion, transcoding, and decentralized media storage:\n\n* **Ingestion and Transcoding Optimization:** The transition to longer video limits requires parallelized multi-part chunk uploads alongside distributed edge-based transcoding clusters to minimize client-side latency and memory footprints.\n* **AT Protocol Blob Architecture:** In the AT Protocol architecture, media files are treated as content-addressed 'blobs' associated with user repositories. Expanding blob size thresholds introduces larger state synchronization payloads across indexing relays and federated Personal Data Servers (PDS).\n* **Content Delivery & Edge Caching:** Delivering high-bitrate, longer-form media at scale demands robust integration with global Content Delivery Networks (CDNs), optimized adaptive bitrate streaming (HLS/DASH), and intelligent cache invalidation architectures.\n* **Bandwidth & Storage Economics:** Federated node operators hosting custom PDS instances must account for increased egress bandwidth and object storage capacity requirements when self-hosting accounts generating long-form media.\n\n## Impact\n\n### For Enterprises & Brand Architecture\n* **Developer Relations & Technical Demos:** Engineering teams can now publish end-to-end architecture walkthroughs, product updates, and technical webinars natively without external redirection.\n* **Decentralized Brand Presence:** Diversifies corporate audience engagement away from single-vendor social platforms, insulating public relations from platform-level policy volatility.\n\n### For Engineering & Infrastructure Teams\n* **Ecosystem Tooling Integration:** Automations utilizing the AT Protocol SDK can now incorporate rich video publishing pipelines into continuous delivery and automated documentation workflows.\n* **Self-Hosting Considerations:** Operators of private or enterprise-managed PDS nodes must evaluate their storage tiering policies (e.g., S3/Cloudflare R2 integration) to handle larger blob payloads.\n\n### Financial & Bottom-Line Implications\n* **Lower Third-Party Video Hosting Overheads:** Native long-form hosting enables direct community reach without mandatory subscription dependencies on third-party video distribution infrastructure.\n* **Resource Allocation:** Potential incremental costs for high-volume corporate accounts running custom relay or storage configurations within the federated network.\n\n## Why it Matters\n\nThe ability to reliably distribute 10-minute high-definition video is a foundational capability for any social protocol aiming to support modern enterprise media operations. By solving the throughput and pipeline bottlenecks associated with larger media assets, Bluesky and the AT Protocol demonstrate that federated, user-owned network topologies can match the performance profile of legacy centralized platforms while offering sovereign identity and open data portability.\n\n---\n*Original Source: [TechCrunch - Bluesky now lets you upload 10-minute long videos](https://techcrunch.com/2026/08/26/bluesky-now-lets-you-upload-10-minute-long-videos/)*",
+    "date": "2026-08-26 13:33:27",
+    "original_link": "https://techcrunch.com/2026/08/26/bluesky-now-lets-you-upload-10-minute-long-videos/",
+    "image": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=1200&h=630&sig=378",
+    "category": "Enterprise Software",
+    "style": "Deep Dive",
+    "format": "Executive Report",
+    "color": "#4f46e5",
+    "source": "techcrunch.com",
+    "reading_time": "7 min",
+    "targetRole": [
+      "CTO",
+      "Founders",
+      "Operations"
+    ],
+    "threatLevel": "Opportunity",
+    "executiveTakeaways": [
+      {
+        "tag": "STRATEGY",
+        "label": "Strategic Vector",
+        "text": "The AT Protocol ecosystem is maturing beyond microblogging into multi-format broadcast media, unlocking richer developer marketing, product demos, and executive communication channels."
+      },
+      {
+        "tag": "IMPACT",
+        "label": "Market & Cost Impact",
+        "text": "Media pipeline modernization reduces upload latency while increasing distributed storage and CDN bandwidth demands across federated Personal Data Servers (PDS)."
+      },
+      {
+        "tag": "ACTION",
+        "label": "Recommended Roadmap",
+        "text": "Enterprise media and brand teams should integrate 10-minute technical deep-dives into decentralized social distribution strategies, while infrastructure teams evaluate AT Protocol media relay implications."
+      }
+    ]
+  },
+  {
     "id": "1b2c6057-0895-459b-b84e-d9e8a3d081a5",
     "title": "Ventures Platform Closes $84M Fund II to Expand Pan-African Tech Ecosystem",
     "subtitle": "Pan-African VC expands mandate beyond Nigeria, driving digital infrastructure and enterprise software growth across the continent.",

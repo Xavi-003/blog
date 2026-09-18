@@ -1,5 +1,43 @@
 [
   {
+    "id": "c71dafaa-4a6f-4fcf-b1c3-14a08e403ea4",
+    "title": "Crusoe raises $3.9B to build massive data centers and small modular ‘AI factories’",
+    "subtitle": "Strategic intelligence analysis from techcrunch.com",
+    "slug": "crusoe-raises-39b-to-build-massive-data-centers-and-small-modular-ai-factories",
+    "content": "## Executive Summary\n\nThe round values the data center giant at $30.9 billion.\n\n## Technical Deep Dive\n\nThis development from **techcrunch.com** highlights key shifts in modern technical architectures and industry execution.\n\n## Impact\n\nProvides measurable improvements in system resilience, operational capabilities, and technological velocity.\n\n## Why it Matters\n\nStaying ahead of these industry trends is essential for maintainable long-term technical leadership.\n\n---\nSOURCE: Adapted from [techcrunch.com](https://techcrunch.com/2026/09/17/crusoe-raises-3-9b-to-build-massive-data-centers-and-small-modular-ai-factories/)",
+    "date": "2026-09-18 13:13:46",
+    "original_link": "https://techcrunch.com/2026/09/17/crusoe-raises-3-9b-to-build-massive-data-centers-and-small-modular-ai-factories/",
+    "image": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=1200&h=630&sig=760",
+    "category": "Enterprise Software",
+    "style": "Deep Dive",
+    "format": "Executive Report",
+    "color": "#4f46e5",
+    "source": "techcrunch.com",
+    "reading_time": "6 min",
+    "targetRole": [
+      "CTO",
+      "Founders"
+    ],
+    "threatLevel": "Opportunity",
+    "executiveTakeaways": [
+      {
+        "tag": "STRATEGY",
+        "label": "Executive Briefing",
+        "text": "The round values the data center giant at $30.9 billion...."
+      },
+      {
+        "tag": "IMPACT",
+        "label": "Industry Dynamics",
+        "text": "Accelerates technological shifts across enterprise deployments and infrastructure paradigms."
+      },
+      {
+        "tag": "ACTION",
+        "label": "Recommended Stance",
+        "text": "Review internal dependencies and evaluate potential architectural alignments."
+      }
+    ]
+  },
+  {
     "id": "f023816d-5c1d-4f9d-9184-f00daee64b92",
     "title": "Mazama Energy Raises $135M for Super-Hot-Rock Geothermal Power",
     "subtitle": "Unlocking 15MW per-well continuous baseload power to solve hyperscale data center energy constraints.",

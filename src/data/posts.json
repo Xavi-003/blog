@@ -1,5 +1,43 @@
 [
   {
+    "id": "968eccce-4fae-4f5c-9db7-4d40b1301beb",
+    "title": "India forces caller-ID apps to feed spam reports to telcos",
+    "subtitle": "Strategic intelligence analysis from techcrunch.com",
+    "slug": "india-forces-caller-id-apps-to-feed-spam-reports-to-telcos",
+    "content": "## Executive Summary\n\nTruecaller says the one-way sharing requirement would hand a commercially valuable proprietary asset to telecom operators.\n\n## Technical Deep Dive\n\nThis development from **techcrunch.com** highlights key shifts in modern technical architectures and industry execution.\n\n## Impact\n\nProvides measurable improvements in system resilience, operational capabilities, and technological velocity.\n\n## Why it Matters\n\nStaying ahead of these industry trends is essential for maintainable long-term technical leadership.\n\n---\nSOURCE: Adapted from [techcrunch.com](https://techcrunch.com/2026/09/18/india-forces-caller-id-apps-to-feed-spam-reports-to-telcos/)",
+    "date": "2026-09-19 04:46:16",
+    "original_link": "https://techcrunch.com/2026/09/18/india-forces-caller-id-apps-to-feed-spam-reports-to-telcos/",
+    "image": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=1200&h=630&sig=581",
+    "category": "Enterprise Software",
+    "style": "Deep Dive",
+    "format": "Executive Report",
+    "color": "#4f46e5",
+    "source": "techcrunch.com",
+    "reading_time": "6 min",
+    "targetRole": [
+      "CTO",
+      "Founders"
+    ],
+    "threatLevel": "Opportunity",
+    "executiveTakeaways": [
+      {
+        "tag": "STRATEGY",
+        "label": "Executive Briefing",
+        "text": "Truecaller says the one-way sharing requirement would hand a commercially valuable proprietary asset to telecom operators...."
+      },
+      {
+        "tag": "IMPACT",
+        "label": "Industry Dynamics",
+        "text": "Accelerates technological shifts across enterprise deployments and infrastructure paradigms."
+      },
+      {
+        "tag": "ACTION",
+        "label": "Recommended Stance",
+        "text": "Review internal dependencies and evaluate potential architectural alignments."
+      }
+    ]
+  },
+  {
     "id": "ce75094e-b394-4835-ada5-86ce3125d260",
     "title": "Anthropic Selects Accenture as First Embedded Enterprise AI Evaluator",
     "subtitle": "Frontier AI lab embeds global system integrator directly into safety and benchmark evaluation loops.",

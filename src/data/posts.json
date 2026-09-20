@@ -1,5 +1,43 @@
 [
   {
+    "id": "8a5e7152-db63-4adc-861d-009eb87a202c",
+    "title": "The US Navy just told us what’s on its tech wish list for the next several years",
+    "subtitle": "Strategic intelligence analysis from techcrunch.com",
+    "slug": "the-us-navy-just-told-us-whats-on-its-tech-wish-list-for-the-next-several-years",
+    "content": "## Executive Summary\n\nNavy CTO Justin Fanelli talks co-investing alongside VCs instead of funding early research himself, recent buys like a $562 million autonomous refueling deal, and the Navy's updated wish list — from AI to quantum — for where founders should be building next.\n\n## Technical Deep Dive\n\nThis development from **techcrunch.com** highlights key shifts in modern technical architectures and industry execution.\n\n## Impact\n\nProvides measurable improvements in system resilience, operational capabilities, and technological velocity.\n\n## Why it Matters\n\nStaying ahead of these industry trends is essential for maintainable long-term technical leadership.\n\n---\nSOURCE: Adapted from [techcrunch.com](https://techcrunch.com/2026/09/19/even-mid-sprint-to-a-secret-flight-the-navys-tech-chief-had-a-pitch-for-investors/)",
+    "date": "2026-09-20 13:07:00",
+    "original_link": "https://techcrunch.com/2026/09/19/even-mid-sprint-to-a-secret-flight-the-navys-tech-chief-had-a-pitch-for-investors/",
+    "image": "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=1200&h=630&sig=198",
+    "category": "Enterprise Software",
+    "style": "Deep Dive",
+    "format": "Executive Report",
+    "color": "#4f46e5",
+    "source": "techcrunch.com",
+    "reading_time": "6 min",
+    "targetRole": [
+      "CTO",
+      "Founders"
+    ],
+    "threatLevel": "Opportunity",
+    "executiveTakeaways": [
+      {
+        "tag": "STRATEGY",
+        "label": "Executive Briefing",
+        "text": "Navy CTO Justin Fanelli talks co-investing alongside VCs instead of funding early research himself, recent buys like a $562 million autonomous refueli..."
+      },
+      {
+        "tag": "IMPACT",
+        "label": "Industry Dynamics",
+        "text": "Accelerates technological shifts across enterprise deployments and infrastructure paradigms."
+      },
+      {
+        "tag": "ACTION",
+        "label": "Recommended Stance",
+        "text": "Review internal dependencies and evaluate potential architectural alignments."
+      }
+    ]
+  },
+  {
     "id": "2eb5177f-f3c0-4b05-9e4d-7b5d05708eb4",
     "title": "US AI Policy Realignment: Federal AI Force and Deregulatory Shifts",
     "subtitle": "Navigating defense-driven sovereign AI procurement, federal deregulation, and compliance bifurcation",
